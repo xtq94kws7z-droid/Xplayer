@@ -34,12 +34,12 @@ Xplayer 是一款面向 Emby / Jellyfin 用户的现代桌面播放器。它不�
 ## 📸 应用截图
 
 <p align="center">
-  <img src="screenshots/2.png" width="45%" alt="首页"/>
-  <img src="screenshots/5.png" width="45%" alt="影片详情"/>
+  <img src="screenshots/home.jpg" width="45%" alt="首页"/>
+  <img src="screenshots/detail.jpg" width="45%" alt="影片详情"/>
 </p>
 <p align="center">
-  <img src="screenshots/3.png" width="45%" alt="设置"/>
-  <img src="screenshots/4.png" width="45%" alt="管理仪表盘"/>
+  <img src="screenshots/library-navigation.jpg" width="45%" alt="媒体库导航"/>
+  <img src="screenshots/settings.jpg" width="45%" alt="设置"/>
 </p>
 
 ## 📥 下载
@@ -215,12 +215,12 @@ Xplayer is a modern desktop client for Emby and Jellyfin. Built natively with **
 ## 📸 Screenshots
 
 <p align="center">
-  <img src="screenshots/2.png" width="45%" alt="Home"/>
-  <img src="screenshots/5.png" width="45%" alt="Detail"/>
+  <img src="screenshots/home.jpg" width="45%" alt="Home"/>
+  <img src="screenshots/detail.jpg" width="45%" alt="Detail"/>
 </p>
 <p align="center">
-  <img src="screenshots/3.png" width="45%" alt="Settings"/>
-  <img src="screenshots/4.png" width="45%" alt="Admin Dashboard"/>
+  <img src="screenshots/library-navigation.jpg" width="45%" alt="Library navigation"/>
+  <img src="screenshots/settings.jpg" width="45%" alt="Settings"/>
 </p>
 
 ## 📥 Download
