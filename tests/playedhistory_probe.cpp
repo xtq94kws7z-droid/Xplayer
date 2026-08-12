@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
     app.setApplicationName(QStringLiteral("Xplayer"));
-    app.setOrganizationName(QStringLiteral("AlanHJ"));
+    app.setOrganizationName(QStringLiteral("Godking"));
     app.setOrganizationDomain(QStringLiteral("local.xplayer"));
 
     XplayerCore core;

@@ -69,7 +69,7 @@ foreach ($path in $removedFiles) {
 }
 
 $scanRoots = @('src/XplayerApp', 'src/XplayerCore')
-$forbidden = 'api\.github\.com/repos/AlanHJ/Xplayer/releases/latest|UpdateManager|WindowsUpdateManager|UpdateDialog|UpdateProgressDialog|UpdateIndicatorButton'
+$forbidden = 'api\.github\.com/repos/[^/]+/Xplayer/releases/latest|UpdateManager|WindowsUpdateManager|UpdateDialog|UpdateProgressDialog|UpdateIndicatorButton'
 foreach ($root in $scanRoots) {
     $matches = rg -n $forbidden $root -g '!resources/i18n/**' -g '!resources/qss/**' -g '!*.ts'
     if ($LASTEXITCODE -eq 0) {

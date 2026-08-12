@@ -1,12 +1,12 @@
 <p align="center">
-  <img src="src/XplayerApp/resources/svg/xplayer_logo.svg" width="120" alt="Xplayer Logo"/>
+  <img src="src/XplayerApp/resources/images/xplayer_icon.png" width="120" alt="Xplayer 图标"/>
 </p>
 
 <h1 align="center">Xplayer</h1>
 
 <p align="center">
-  <b>A modern desktop client for Emby & Jellyfin media servers</b><br/>
-  <b>Emby & Jellyfin 媒体服务器的现代桌面客户端</b>
+  <b>为 Emby 与 Jellyfin 打造的原生桌面影音中心</b><br/>
+  <b>快、稳、顺，专注高质量媒体浏览与播放体验</b>
 </p>
 
 <p align="center">
@@ -194,10 +194,6 @@ Xplayer/
         └── views/              # 应用视图
 ```
 
-## 💬 交流社区
-
-加入 Telegram 交流群：[https://t.me/+qXQ-zU56z9gxOWNl](https://t.me/+qXQ-zU56z9gxOWNl)
-
 > **注意：** 本项目是个人开发的测试版本，建议在非关键设备上体验。如有问题请通过 [GitHub Issues](https://github.com/xtq94kws7z-droid/Xplayer/issues) 反馈。
 
 ## 📄 许可证
@@ -382,10 +378,6 @@ Xplayer/
         ├── utils/              # Utility classes
         └── views/              # Application views
 ```
-
-## 💬 Community
-
-Join our Telegram group: [https://t.me/+qXQ-zU56z9gxOWNl](https://t.me/+qXQ-zU56z9gxOWNl)
 
 > **Note:** This is an independently developed test release. Try it on non-critical systems and report issues through [GitHub Issues](https://github.com/xtq94kws7z-droid/Xplayer/issues).
 

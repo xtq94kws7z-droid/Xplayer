@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>svg/xplayer_logo.svg</file>
         <file>images/xplayer_icon.png</file>
         <file>qss/light-style.qss</file>
         <file>svg/light/close.svg</file>

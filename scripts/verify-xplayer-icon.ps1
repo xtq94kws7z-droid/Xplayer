@@ -78,4 +78,12 @@ Assert-FileNotContains -Path 'src/XplayerApp/main.cpp' `
     -Pattern 'xplayer_logo\.svg' `
     -Message 'main.cpp must not use the old xplayer_logo.svg icon.'
 
+Assert-FileNotContains -Path 'README.md' `
+    -Pattern 'xplayer_logo\.svg' `
+    -Message 'README.md must use the current PNG application icon.'
+
+Assert-FileNotContains -Path 'src/XplayerApp/resources/resources.qrc' `
+    -Pattern 'xplayer_logo\.svg' `
+    -Message 'The obsolete xplayer_logo.svg must not remain in application resources.'
+
 Write-Host 'Xplayer icon verification passed.'

@@ -17,7 +17,7 @@ function Assert-FileContains {
 }
 
 Assert-FileContains -Path 'CMakeLists.txt' `
-    -Pattern 'project\s*\(\s*Xplayer\s+VERSION\s+1\.0\.1\s+LANGUAGES\s+CXX\s*\)' `
+    -Pattern 'project\s*\(\s*Xplayer\s+VERSION\s+1\.0\.4\s+LANGUAGES\s+CXX\s*\)' `
     -Message 'Root CMake project must be named Xplayer.'
 
 Assert-FileContains -Path 'src/XplayerApp/CMakeLists.txt' `
@@ -35,6 +35,14 @@ Assert-FileContains -Path 'src/XplayerApp/main.cpp' `
 Assert-FileContains -Path 'src/XplayerApp/main.cpp' `
     -Pattern 'setOrganizationDomain\s*\(\s*"local\.xplayer"\s*\)' `
     -Message 'Organization domain must be local.xplayer for the forked app identity.'
+
+Assert-FileContains -Path 'src/XplayerApp/main.cpp' `
+    -Pattern 'kOrganizationName\s*=\s*"Godking"' `
+    -Message 'Application organization must use the Godking brand.'
+
+Assert-FileContains -Path 'src/XplayerApp/main.cpp' `
+    -Pattern 'migrateLegacyOrganizationStorage' `
+    -Message 'Brand migration must preserve settings from earlier installations.'
 
 Assert-FileContains -Path 'src/XplayerApp/views/settings/pageabout.cpp' `
     -Pattern 'm_appNameLabel\s*=\s*new QLabel\s*\(\s*qApp->applicationName\(\)' `
