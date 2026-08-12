@@ -14,7 +14,7 @@
   <a href="https://github.com/xtq94kws7z-droid/Xplayer/releases/latest"><img src="https://img.shields.io/github/v/release/xtq94kws7z-droid/Xplayer?include_prereleases&label=Download" alt="Release"/></a>
   <img src="https://img.shields.io/badge/Qt-6.x-green.svg" alt="Qt 6"/>
   <img src="https://img.shields.io/badge/C%2B%2B-20-orange.svg" alt="C++20"/>
-  <img src="https://img.shields.io/badge/Platform-Windows%20|%20Linux%20|%20macOS-lightgrey.svg" alt="Platform: Windows | Linux | macOS"/>
+  <img src="https://img.shields.io/badge/Platform-Windows%2010%2F11%20x64-lightgrey.svg" alt="平台：Windows 10/11 x64"/>
 </p>
 
 <p align="center">
@@ -74,7 +74,7 @@ Xplayer 是一款面向 Emby / Jellyfin 用户的现代桌面播放器。它不�
 - 🌐 国际化支持（中文 / 英文 / 法语）
 - 🔍 支持搜索历史的媒体搜索
 - 📺 当前支持电视剧、电影媒体类型
-- 📦 提供 Windows 安装包 / 绿色版、Linux AppImage / deb 包和 macOS DMG
+- 📦 提供 Windows 10/11 x64 安装包和绿色便携版
 - ⚡ 基于 C++20 协程的异步操作（QCoro）
 - 🪟 原生风格的自定义窗口边框（QWindowKit）
 
@@ -83,8 +83,6 @@ Xplayer 是一款面向 Emby / Jellyfin 用户的现代桌面播放器。它不�
 | 平台 | 状态 |
 |---|---|
 | Windows 10/11 x64 | ✅ 已适配 |
-| Linux x64 (AppImage / deb) | ✅ 已适配 |
-| macOS 26+ (Apple Silicon) | ✅ 已适配 |
 
 ## 📋 开发路线图
 
@@ -104,8 +102,6 @@ Xplayer 是一款面向 Emby / Jellyfin 用户的现代桌面播放器。它不�
 - [x] 单例应用模式
 - [x] 多弹幕源支持（弹弹Play / danmu_api）
 - [ ] AI 字幕生成
-- [x] Linux 平台适配
-- [x] macOS 平台适配
 
 > 本项目为个人兴趣开发，欢迎贡献和反馈！
 
@@ -259,7 +255,7 @@ Older releases are available on the [Releases](https://github.com/xtq94kws7z-dro
 - 🌐 Internationalization support (Chinese / English / French)
 - 🔍 Media search with history
 - 📺 TV series and movies media types
-- 📦 Windows installer / portable packages, Linux AppImage / deb packages, and macOS DMG
+- 📦 Windows 10/11 x64 installer and portable package
 - ⚡ Asynchronous operations with C++20 coroutines (QCoro)
 - 🪟 Custom window frame with native look (QWindowKit)
 
@@ -268,8 +264,6 @@ Older releases are available on the [Releases](https://github.com/xtq94kws7z-dro
 | Platform | Status |
 |---|---|
 | Windows 10/11 x64 | ✅ Supported |
-| Linux x64 (AppImage / deb) | ✅ Supported |
-| macOS 26+ (Apple Silicon) | ✅ Supported |
 
 ## 📋 Roadmap
 
@@ -289,10 +283,8 @@ Older releases are available on the [Releases](https://github.com/xtq94kws7z-dro
 - [x] Single-application mode
 - [x] Multiple danmaku providers (DandanPlay / danmu_api)
 - [ ] AI-powered subtitle generation
-- [x] Linux platform support
-- [x] macOS platform support
 
-> This is a personal hobby project, developed out of interest. Contributions and feedback are welcome!
+> This is an independently developed Windows desktop test release. Contributions and feedback are welcome!
 
 ## 🛠️ Tech Stack
 
