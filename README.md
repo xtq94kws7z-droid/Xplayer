@@ -1,0 +1,404 @@
+<p align="center">
+  <img src="src/XplayerApp/resources/svg/xplayer_logo.svg" width="120" alt="Xplayer Logo"/>
+</p>
+
+<h1 align="center">Xplayer</h1>
+
+<p align="center">
+  <b>A modern desktop client for Emby & Jellyfin media servers</b><br/>
+  <b>Emby & Jellyfin 媒体服务器的现代桌面客户端</b>
+</p>
+
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"/></a>
+  <a href="https://github.com/AlanHJ/Xplayer/releases/latest"><img src="https://img.shields.io/github/v/release/AlanHJ/Xplayer?include_prereleases&label=Download" alt="Release"/></a>
+  <img src="https://img.shields.io/badge/Qt-6.x-green.svg" alt="Qt 6"/>
+  <img src="https://img.shields.io/badge/C%2B%2B-20-orange.svg" alt="C++20"/>
+  <img src="https://img.shields.io/badge/Platform-Windows%20|%20Linux%20|%20macOS-lightgrey.svg" alt="Platform: Windows | Linux | macOS"/>
+</p>
+
+<p align="center">
+  <a href="#中文">中文</a> | <a href="#english">English</a>
+</p>
+
+---
+
+<a id="中文"></a>
+
+## 📸 应用截图
+
+<p align="center">
+  <img src="screenshots/2.png" width="45%" alt="首页"/>
+  <img src="screenshots/5.png" width="45%" alt="影片详情"/>
+</p>
+<p align="center">
+  <img src="screenshots/3.png" width="45%" alt="设置"/>
+  <img src="screenshots/4.png" width="45%" alt="管理仪表盘"/>
+</p>
+
+## 📥 下载
+
+最新版本：**v0.0.7**
+
+| 安装包 | 说明 |
+|---|---|
+| [Xplayer-0.0.7-Win-x64-Setup.exe](https://github.com/AlanHJ/Xplayer/releases/download/v0.0.7/Xplayer-0.0.7-Win-x64-Setup.exe) | Windows 10/11 x64 安装包 |
+| [Xplayer-0.0.7-Win-x64.zip](https://github.com/AlanHJ/Xplayer/releases/download/v0.0.7/Xplayer-0.0.7-Win-x64.zip) | Windows 10/11 x64 绿色便携版 |
+| [xplayer-0.0.7-macos-arm64.dmg](https://github.com/AlanHJ/Xplayer/releases/download/v0.0.7/xplayer-0.0.7-macos-arm64.dmg) | macOS 26+ (Apple 芯片) |
+| [xplayer-0.0.7-x86_64.AppImage](https://github.com/AlanHJ/Xplayer/releases/download/v0.0.7/xplayer-0.0.7-x86_64.AppImage) | Linux x64 通用 AppImage |
+| [xplayer_0.0.7-noble_amd64.deb](https://github.com/AlanHJ/Xplayer/releases/download/v0.0.7/xplayer_0.0.7-noble_amd64.deb) | Ubuntu 24.04 (Noble) 安装包 |
+| [xplayer_0.0.7-jammy_amd64.deb](https://github.com/AlanHJ/Xplayer/releases/download/v0.0.7/xplayer_0.0.7-jammy_amd64.deb) | Ubuntu 22.04 (Jammy) 安装包 |
+| [xplayer_0.0.7-bookworm_amd64.deb](https://github.com/AlanHJ/Xplayer/releases/download/v0.0.7/xplayer_0.0.7-bookworm_amd64.deb) | Debian 12 (Bookworm) 安装包 |
+| [xplayer_0.0.7-trixie_amd64.deb](https://github.com/AlanHJ/Xplayer/releases/download/v0.0.7/xplayer_0.0.7-trixie_amd64.deb) | Debian 13 (Trixie) 安装包 |
+
+旧版本可以在 [Releases](https://github.com/AlanHJ/Xplayer/releases) 页面下载。
+
+## 🚀 v0.0.7 更新内容
+
+- 弹弹Play新增 v2 直接搜索、标准动画标题发现和旧版接口回退的多阶段搜索流程。
+- 改进基于 TMDB 的季度和集数约束，以及手动搜索中的明确集数处理。
+- 改进弹幕候选排序，优先采用哈希、提供者 ID 和文件名匹配，并按作品、季度和集数组织结果。
+- 修复播放器覆盖对话框显示时按键事件穿透到播放器的问题。
+- 修复深色和浅色主题下播放列表搜索框的高度。
+
+## ✨ 功能特性
+
+- 🎬 浏览和管理你的 Emby / Jellyfin 媒体库
+- ▶️ 内置 **libmpv** 驱动的视频播放器
+- 💬 弹幕播放，支持弹弹Play与 LogVar / danmu_api、搜索、匹配、缓存和原生覆盖层渲染
+- 🧩 支持元数据编辑、媒体识别、图片更新和播放列表管理
+- 📥 下载管理器
+- 🔄 自动检查更新和 Windows 应用内升级
+- 🖥️ 可选单例应用模式
+- 🌗 深色 / 浅色主题切换
+- 🌐 国际化支持（中文 / 英文 / 法语）
+- 🔍 支持搜索历史的媒体搜索
+- 📺 当前支持电视剧、电影媒体类型
+- 📦 提供 Windows 安装包 / 绿色版、Linux AppImage / deb 包和 macOS DMG
+- ⚡ 基于 C++20 协程的异步操作（QCoro）
+- 🪟 原生风格的自定义窗口边框（QWindowKit）
+
+## 💻 平台支持
+
+| 平台 | 状态 |
+|---|---|
+| Windows 10/11 x64 | ✅ 已适配 |
+| Linux x64 (AppImage / deb) | ✅ 已适配 |
+| macOS 26+ (Apple Silicon) | ✅ 已适配 |
+
+## 📋 开发路线图
+
+- [x] Emby / Jellyfin 媒体库浏览
+- [x] 内置视频播放器（libmpv）
+- [x] 深色 / 浅色主题
+- [x] 国际化支持（中文 / 英文）
+- [x] 媒体搜索与搜索历史
+- [x] 电视剧、电影支持
+- [x] 服务器管理仪表盘
+- [x] 支持添加到播放列表和从播放列表中移除
+- [x] 支持识别来更新元数据
+- [x] 支持修改元数据和图片
+- [x] 弹幕系统（搜索、匹配、设置、渲染）
+- [x] 下载管理器
+- [x] 自动检查更新和 Windows 应用内升级
+- [x] 单例应用模式
+- [x] 多弹幕源支持（弹弹Play / danmu_api）
+- [ ] AI 字幕生成
+- [x] Linux 平台适配
+- [x] macOS 平台适配
+
+> 本项目为个人兴趣开发，欢迎贡献和反馈！
+
+## 🛠️ 技术栈
+
+| 组件 | 技术 |
+|---|---|
+| 框架 | Qt 6.x (Widgets) |
+| 语言 | C++20 |
+| 视频播放 | libmpv |
+| 异步 | QCoro (Qt C++20 协程) |
+| 日志 | spdlog |
+| 窗口框架 | QWindowKit |
+| 构建系统 | CMake |
+
+## 📦 环境要求
+
+- **Qt 6.x**（包含 Widgets、Core、Network、Concurrent、OpenGLWidgets、LinguistTools、WebSockets 模块）
+- **CMake** ≥ 3.16
+- 支持 **C++20** 的编译器（推荐 MSVC 2022）
+- **libmpv** 开发文件（见下方说明）
+- **Git**（用于克隆子模块）
+
+## 🚀 构建指南
+
+### 1. 克隆仓库
+
+```bash
+git clone --recursive https://github.com/AlanHJ/Xplayer.git
+cd Xplayer
+```
+
+### 2. 获取 libmpv
+
+下载 libmpv 开发包，并放置到 `libs/libmpv/` 目录下，结构如下：
+
+```
+libs/libmpv/
+├── bin/
+│   └── libmpv-2.dll
+├── include/
+│   └── mpv/
+│       ├── client.h
+│       └── render.h (等)
+└── lib/
+    └── libmpv.dll.a
+```
+
+libmpv 获取方式：
+- [shinchiro/mpv-winbuild-cmake](https://github.com/shinchiro/mpv-winbuild-cmake/releases)（Windows 预编译版本）
+- [mpv-player/mpv](https://github.com/mpv-player/mpv)（从源码编译）
+
+### 3. 配置和构建
+
+```bash
+cmake -B build -DCMAKE_PREFIX_PATH="/path/to/Qt6/lib/cmake"
+cmake --build build --config Release
+```
+
+> **提示：** 在 Windows 上使用 MSVC 时，也可以直接在 Qt Creator 或 Visual Studio 中打开 CMake 项目。
+>
+> 在 Windows 上使用项目内置的 Qt MinGW 工具链时，建议执行
+> `powershell -ExecutionPolicy Bypass -File scripts/build-xplayer.ps1`。
+> 该脚本会先注入 MinGW 运行时路径并执行最小编译探针，避免 `cc1plus.exe`
+> 因找不到 `libwinpthread-1.dll` 而出现大量无诊断构建失败。
+
+## 📁 项目结构
+
+```
+Xplayer/
+├── CMakeLists.txt              # 根 CMake 配置
+├── libs/
+│   ├── libmpv/                 # libmpv SDK（未纳入版本控制，见构建指南）
+│   └── qwindowkit/             # QWindowKit（git 子模块）
+└── src/
+    ├── XplayerCore/              # 核心库（API、模型、服务）
+    │   ├── api/                # Emby/Jellyfin API 客户端
+    │   ├── config/             # 配置管理
+    │   ├── models/             # 数据模型
+    │   └── services/           # 业务逻辑服务
+    └── XplayerApp/               # 桌面应用
+        ├── components/         # 可复用 UI 组件
+        ├── managers/           # 应用管理器
+        ├── resources/          # 图标、主题、翻译
+        ├── utils/              # 工具类
+        └── views/              # 应用视图
+```
+
+## 💬 交流社区
+
+加入 Telegram 交流群：[https://t.me/+qXQ-zU56z9gxOWNl](https://t.me/+qXQ-zU56z9gxOWNl)
+
+> **注意：** 本项目是为爱发电项目，测试覆盖不全，敬请谅解。如有问题请通过 [GitHub Issues](https://github.com/AlanHJ/Xplayer/issues) 反馈。
+
+## 📄 许可证
+
+本项目基于 [MIT 许可证](LICENSE) 开源。
+
+## 🙏 致谢
+
+- [Qt](https://www.qt.io/) — 应用框架 (LGPL v3)
+- [mpv](https://mpv.io/) — 媒体播放引擎 (LGPL v2.1+)
+- [QWindowKit](https://github.com/stdware/qwindowkit) — 自定义窗口框架 (Apache-2.0)
+- [QCoro](https://github.com/danvratil/qcoro) — Qt C++20 协程库 (MIT)
+- [spdlog](https://github.com/gabime/spdlog) — 高性能日志库 (MIT)
+
+---
+
+<a id="english"></a>
+
+## 📸 Screenshots
+
+<p align="center">
+  <img src="screenshots/2.png" width="45%" alt="Home"/>
+  <img src="screenshots/5.png" width="45%" alt="Detail"/>
+</p>
+<p align="center">
+  <img src="screenshots/3.png" width="45%" alt="Settings"/>
+  <img src="screenshots/4.png" width="45%" alt="Admin Dashboard"/>
+</p>
+
+## 📥 Download
+
+Latest release: **v0.0.7**
+
+| Package | Description |
+|---|---|
+| [Xplayer-0.0.7-Win-x64-Setup.exe](https://github.com/AlanHJ/Xplayer/releases/download/v0.0.7/Xplayer-0.0.7-Win-x64-Setup.exe) | Windows 10/11 x64 installer |
+| [Xplayer-0.0.7-Win-x64.zip](https://github.com/AlanHJ/Xplayer/releases/download/v0.0.7/Xplayer-0.0.7-Win-x64.zip) | Windows 10/11 x64 portable package |
+| [xplayer-0.0.7-macos-arm64.dmg](https://github.com/AlanHJ/Xplayer/releases/download/v0.0.7/xplayer-0.0.7-macos-arm64.dmg) | macOS 26+ (Apple Silicon) |
+| [xplayer-0.0.7-x86_64.AppImage](https://github.com/AlanHJ/Xplayer/releases/download/v0.0.7/xplayer-0.0.7-x86_64.AppImage) | Universal Linux x64 AppImage |
+| [xplayer_0.0.7-noble_amd64.deb](https://github.com/AlanHJ/Xplayer/releases/download/v0.0.7/xplayer_0.0.7-noble_amd64.deb) | Ubuntu 24.04 (Noble) package |
+| [xplayer_0.0.7-jammy_amd64.deb](https://github.com/AlanHJ/Xplayer/releases/download/v0.0.7/xplayer_0.0.7-jammy_amd64.deb) | Ubuntu 22.04 (Jammy) package |
+| [xplayer_0.0.7-bookworm_amd64.deb](https://github.com/AlanHJ/Xplayer/releases/download/v0.0.7/xplayer_0.0.7-bookworm_amd64.deb) | Debian 12 (Bookworm) package |
+| [xplayer_0.0.7-trixie_amd64.deb](https://github.com/AlanHJ/Xplayer/releases/download/v0.0.7/xplayer_0.0.7-trixie_amd64.deb) | Debian 13 (Trixie) package |
+
+Older releases are available on the [Releases](https://github.com/AlanHJ/Xplayer/releases) page.
+
+## 🚀 What's New in v0.0.7
+
+- Added a multi-stage DandanPlay search flow with direct v2 search, canonical anime-title discovery, and legacy fallback.
+- Improved TMDB-constrained season and episode matching and explicit episode handling in manual searches.
+- Improved danmaku candidate ordering by prioritizing hash, provider-ID, and filename matches and organizing results by work, season, and episode.
+- Prevented keyboard events from passing through to the player while an overlay dialog is visible.
+- Fixed the playlist search input height in both Dark and Light themes.
+
+## ✨ Features
+
+- 🎬 Browse and manage your Emby / Jellyfin media library
+- ▶️ Built-in video player powered by **libmpv**
+- 💬 Danmaku playback with DandanPlay and LogVar / danmu_api, search, matching, cache and native overlay rendering
+- 🧩 Metadata editing, media identification, image updates and playlist tools
+- 📥 Download manager
+- 🔄 Automatic update checks and in-app Windows updates
+- 🖥️ Optional single-application mode
+- 🌗 Dark and Light theme support
+- 🌐 Internationalization support (Chinese / English / French)
+- 🔍 Media search with history
+- 📺 TV series and movies media types
+- 📦 Windows installer / portable packages, Linux AppImage / deb packages, and macOS DMG
+- ⚡ Asynchronous operations with C++20 coroutines (QCoro)
+- 🪟 Custom window frame with native look (QWindowKit)
+
+## 💻 Platform Support
+
+| Platform | Status |
+|---|---|
+| Windows 10/11 x64 | ✅ Supported |
+| Linux x64 (AppImage / deb) | ✅ Supported |
+| macOS 26+ (Apple Silicon) | ✅ Supported |
+
+## 📋 Roadmap
+
+- [x] Emby / Jellyfin media library browsing
+- [x] Built-in video player (libmpv)
+- [x] Dark / Light theme
+- [x] Internationalization (Chinese / English)
+- [x] Media search with history
+- [x] TV series & movies support
+- [x] Server administration dashboard
+- [x] Playlist support (add/remove items)
+- [x] Media identification & metadata refresh
+- [x] Metadata and image editing
+- [x] Danmaku (bullet comments) system
+- [x] Download manager
+- [x] Automatic update checks and in-app Windows updates
+- [x] Single-application mode
+- [x] Multiple danmaku providers (DandanPlay / danmu_api)
+- [ ] AI-powered subtitle generation
+- [x] Linux platform support
+- [x] macOS platform support
+
+> This is a personal hobby project, developed out of interest. Contributions and feedback are welcome!
+
+## 🛠️ Tech Stack
+
+| Component | Technology |
+|---|---|
+| Framework | Qt 6.x (Widgets) |
+| Language | C++20 |
+| Video Player | libmpv |
+| Async | QCoro (C++20 Coroutines for Qt) |
+| Logging | spdlog |
+| Window Kit | QWindowKit |
+| Build System | CMake |
+
+## 📦 Prerequisites
+
+- **Qt 6.x** (with Widgets, Core, Network, Concurrent, OpenGLWidgets, LinguistTools, WebSockets)
+- **CMake** ≥ 3.16
+- **C++20** compatible compiler (MSVC 2022 recommended)
+- **libmpv** development files (see below)
+- **Git** (for cloning submodules)
+
+## 🚀 Build
+
+### 1. Clone the repository
+
+```bash
+git clone --recursive https://github.com/AlanHJ/Xplayer.git
+cd Xplayer
+```
+
+### 2. Get libmpv
+
+Download the libmpv development package and place it in `libs/libmpv/` with the following structure:
+
+```
+libs/libmpv/
+├── bin/
+│   └── libmpv-2.dll
+├── include/
+│   └── mpv/
+│       ├── client.h
+│       └── render.h (etc.)
+└── lib/
+    └── libmpv.dll.a
+```
+
+You can get libmpv from:
+- [shinchiro/mpv-winbuild-cmake](https://github.com/shinchiro/mpv-winbuild-cmake/releases) (Windows builds)
+- [mpv-player/mpv](https://github.com/mpv-player/mpv) (build from source)
+
+### 3. Configure and build
+
+```bash
+cmake -B build -DCMAKE_PREFIX_PATH="/path/to/Qt6/lib/cmake"
+cmake --build build --config Release
+```
+
+> **Tip:** On Windows with MSVC, you can also open the project in Qt Creator or Visual Studio with CMake support.
+>
+> When using the bundled Qt MinGW toolchain on Windows, prefer
+> `powershell -ExecutionPolicy Bypass -File scripts/build-xplayer.ps1`.
+> The script injects the MinGW runtime path and runs a minimal compiler probe before
+> building, preventing silent failures when `cc1plus.exe` cannot load `libwinpthread-1.dll`.
+
+## 📁 Project Structure
+
+```
+Xplayer/
+├── CMakeLists.txt              # Root CMake configuration
+├── libs/
+│   ├── libmpv/                 # libmpv SDK (not tracked, see Build section)
+│   └── qwindowkit/             # QWindowKit (git submodule)
+└── src/
+    ├── XplayerCore/              # Core library (API, models, services)
+    │   ├── api/                # Emby/Jellyfin API client
+    │   ├── config/             # Configuration management
+    │   ├── models/             # Data models
+    │   └── services/           # Business logic services
+    └── XplayerApp/               # Desktop application
+        ├── components/         # Reusable UI components
+        ├── managers/           # Application managers
+        ├── resources/          # Icons, themes, translations
+        ├── utils/              # Utility classes
+        └── views/              # Application views
+```
+
+## 💬 Community
+
+Join our Telegram group: [https://t.me/+qXQ-zU56z9gxOWNl](https://t.me/+qXQ-zU56z9gxOWNl)
+
+> **Note:** This is a passion project with limited testing. Your understanding is appreciated. Please report any issues via [GitHub Issues](https://github.com/AlanHJ/Xplayer/issues).
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).
+
+## 🙏 Acknowledgements
+
+- [Qt](https://www.qt.io/) — Application framework (LGPL v3)
+- [mpv](https://mpv.io/) — Media player engine (LGPL v2.1+)
+- [QWindowKit](https://github.com/stdware/qwindowkit) — Custom window frame (Apache-2.0)
+- [QCoro](https://github.com/danvratil/qcoro) — C++20 Coroutines for Qt (MIT)
+- [spdlog](https://github.com/gabime/spdlog) — Fast logging library (MIT)

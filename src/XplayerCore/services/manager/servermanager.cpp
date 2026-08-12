@@ -1,0 +1,245 @@
+#include "servermanager.h"
+#include "../../api/embywebsocket.h"
+#include "../../utils/secretpersistence.h"
+#include <QDebug>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QFile>
+#include <QStandardPaths>
+#include <QDir>
+
+ServerManager::ServerManager(NetworkManager* nm, QObject* parent)
+    : QObject(parent), m_network(nm) {
+    loadSettings();
+}
+
+void ServerManager::addServer(const ServerProfile& profile) {
+    
+    for (int i = 0; i < m_servers.size(); ++i) {
+        if (m_servers[i].url == profile.url && m_servers[i].userId == profile.userId) {
+            m_servers[i] = profile;
+            saveSettings();
+            Q_EMIT serversChanged();
+            return;
+        }
+    }
+    m_servers.append(profile);
+    saveSettings();
+    Q_EMIT serversChanged();
+}
+
+void ServerManager::removeServer(const QString& id) {
+    for (int i = 0; i < m_servers.size(); ++i) {
+        if (m_servers[i].id == id) {
+            
+            m_servers.removeAt(i);
+
+            
+            saveSettings();
+            Q_EMIT serversChanged();
+
+            
+            if (m_activeProfile.id == id) {
+                
+                disconnectWebSocket();
+                
+                m_activeProfile = ServerProfile();
+                m_activeClient.reset();
+
+                
+                if (!m_servers.isEmpty()) {
+                    setActiveServer(m_servers.first().id);
+                } else {
+                    
+                    Q_EMIT activeServerChanged(m_activeProfile);
+                }
+            }
+            break; 
+        }
+    }
+}
+
+void ServerManager::setActiveServer(const QString& id) {
+    for (const auto& profile : m_servers) {
+        if (profile.id == id) {
+            m_activeProfile = profile;
+            
+            m_activeClient = QSharedPointer<ApiClient>::create(profile, m_network);
+            Q_EMIT activeServerChanged(m_activeProfile);
+            return;
+        }
+    }
+}
+
+void ServerManager::updateServerProxy(const QString& id,
+                                      const ProxyConfig& proxy,
+                                      bool useGlobalProxy) {
+    bool found = false;
+    bool isActive = false;
+    for (int i = 0; i < m_servers.size(); ++i) {
+        if (m_servers[i].id != id) {
+            continue;
+        }
+        
+        if (m_servers[i].proxy == proxy &&
+            m_servers[i].useGlobalProxy == useGlobalProxy) {
+            qDebug() << "[ServerManager] updateServerProxy skipped: no change"
+                     << "| id:" << id;
+            return;
+        }
+        m_servers[i].proxy = proxy;
+        m_servers[i].useGlobalProxy = useGlobalProxy;
+
+        
+        
+        if (m_activeProfile.id == id) {
+            m_activeProfile = m_servers[i];
+            isActive = true;
+        }
+        found = true;
+        break;
+    }
+
+    if (!found) {
+        qWarning() << "[ServerManager] updateServerProxy: server not found"
+                   << "| id:" << id;
+        return;
+    }
+
+    saveSettings();
+    qInfo() << "[ServerManager] proxy updated"
+            << "| id:" << id
+            << "| useGlobalProxy:" << useGlobalProxy
+            << "| proxy:" << proxy.summary();
+
+    Q_EMIT serversChanged();
+    Q_EMIT serverProxyChanged(id);
+    if (isActive) {
+        Q_EMIT activeServerChanged(m_activeProfile);
+    }
+}
+
+
+
+
+
+void ServerManager::connectWebSocket()
+{
+    
+    if (m_activeProfile.url.isEmpty() || m_activeProfile.accessToken.isEmpty()) return;
+
+    
+    if (m_activeWebSocket && m_activeWebSocket->isConnected()) return;
+
+    
+    if (m_activeWebSocket) {
+        m_activeWebSocket->disconnectFromServer();
+        m_activeWebSocket->deleteLater();
+        m_activeWebSocket = nullptr;
+    }
+
+    
+    m_activeWebSocket = new EmbyWebSocket(m_activeProfile, this);
+    m_activeWebSocket->connectToServer();
+}
+
+void ServerManager::disconnectWebSocket()
+{
+    if (m_activeWebSocket) {
+        m_activeWebSocket->disconnectFromServer();
+        m_activeWebSocket->deleteLater();
+        m_activeWebSocket = nullptr;
+    }
+}
+
+EmbyWebSocket* ServerManager::activeWebSocket() const
+{
+    return m_activeWebSocket;
+}
+
+
+
+
+
+void ServerManager::saveSettings() {
+    
+    QJsonArray array;
+    for (const auto& p : m_servers) {
+        QJsonObject obj;
+        obj["id"] = p.id;
+        obj["name"] = p.name;
+        obj["url"] = p.url;
+        obj["type"] = (p.type == ServerProfile::Emby ? "Emby" : "Jellyfin");
+        obj["ignoreSslVerification"] = p.ignoreSslVerification;
+        obj["userId"] = p.userId;
+        obj["userName"] = p.userName;
+        const QString accessTokenCipher =
+            SecretPersistence::encryptToBase64(p.accessToken);
+        if (!accessTokenCipher.isEmpty()) {
+            obj["accessTokenCipher"] = accessTokenCipher;
+        } else if (!p.accessToken.isEmpty()) {
+            qWarning() << "[ServerManager] access token encryption failed;"
+                       << "saving profile without persisted token"
+                       << "| id:" << p.id;
+        }
+        obj["deviceId"] = p.deviceId;
+        obj["isAdmin"] = p.isAdmin;
+        obj["canDownloadMedia"] = p.canDownloadMedia;
+        obj["iconBase64"] = p.iconBase64;
+        obj["useGlobalProxy"] = p.useGlobalProxy;
+        obj["proxy"] = p.proxy.toJson();
+        array.append(obj);
+    }
+
+    QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QDir().mkpath(path);
+    QFile file(path + "/servers.json");
+    if (file.open(QIODevice::WriteOnly)) {
+        file.write(QJsonDocument(array).toJson());
+    }
+}
+
+void ServerManager::loadSettings() {
+    QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QFile file(path + "/servers.json");
+    if (!file.open(QIODevice::ReadOnly)) return;
+
+    QJsonArray array = QJsonDocument::fromJson(file.readAll()).array();
+    m_servers.clear();
+    for (auto val : array) {
+        QJsonObject obj = val.toObject();
+        ServerProfile p;
+        p.id = obj["id"].toString();
+        p.name = obj["name"].toString();
+        p.url = obj["url"].toString();
+        p.type = (obj["type"].toString() == "Emby" ? ServerProfile::Emby : ServerProfile::Jellyfin);
+        p.ignoreSslVerification = obj["ignoreSslVerification"].toBool(false);
+        p.userId = obj["userId"].toString();
+        p.userName = obj["userName"].toString();
+        p.accessToken = SecretPersistence::decryptFromBase64(
+            obj["accessTokenCipher"].toString());
+        if (p.accessToken.isEmpty()) {
+            p.accessToken = obj["accessToken"].toString();
+        }
+        p.deviceId = obj["deviceId"].toString();
+        p.isAdmin = obj["isAdmin"].toBool();
+        p.canDownloadMedia = obj["canDownloadMedia"].toBool(false);
+        p.iconBase64 = obj["iconBase64"].toString();
+        p.useGlobalProxy = obj["useGlobalProxy"].toBool(false);
+        p.proxy = ProxyConfig::fromJson(obj["proxy"].toObject());
+        m_servers.append(p);
+    }
+
+    
+    if (!m_servers.isEmpty()) {
+        setActiveServer(m_servers.first().id);
+    }
+}
+
+void ServerManager::clearActiveSession()
+{
+    disconnectWebSocket();
+    m_activeProfile = ServerProfile();
+    m_activeClient.reset();
+    Q_EMIT activeServerChanged(m_activeProfile);
+}

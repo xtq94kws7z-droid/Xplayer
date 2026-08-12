@@ -1,0 +1,189 @@
+#ifndef HOMEVIEW_H
+#define HOMEVIEW_H
+
+#include <QStack>
+#include <QWidget>
+#include <QHBoxLayout>
+#include <QPropertyAnimation>
+#include <QPointer>
+#include <qcorotask.h>
+#include <optional>
+#include <functional>
+#include <models/media/mediaitem.h>
+
+class QTimer;
+class XplayerCore;
+class SlidingStackedWidget;
+class QLabel;
+class QPushButton;
+class QAction;
+class QLineEdit;
+class QListWidget;
+class QGraphicsDropShadowEffect;
+class QCompleter;
+class QStringListModel;
+class ElidedLabel;
+class QBoxLayout;
+class QVBoxLayout;
+class DashboardView;
+class FavoritesView;
+class SettingsView;
+class SmoothScrollController;
+class SeasonView; 
+class PlaybackManager; 
+class PlayerView;      
+class ManageView;      
+class WebdavProfileStore;
+
+
+struct RouteInfo {
+    QPointer<QWidget> widget; 
+    bool isDynamic;           
+    QString routeType;        
+    QString routeId;          
+    QString routeTitle;       
+    QString routeExtraId;     
+};
+
+class HomeView : public QWidget
+{
+    Q_OBJECT
+public:
+    explicit HomeView(XplayerCore* core, QWidget *parent = nullptr);
+    ~HomeView() override;
+    
+    
+    QCoro::Task<void> refreshProfile();
+
+    
+    void triggerSearch(const QString& query);
+
+    
+    bool canNavigateBack() const;
+
+    bool canGoHome() const;
+
+    bool canGoFav() const;
+
+    
+    PlayerView* activePlayerView() const;
+
+public Q_SLOTS:
+    
+    void navigateBack();
+    void goHome();
+    void goFav();
+
+protected:
+    bool eventFilter(QObject *watched, QEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
+    void showEvent(QShowEvent *event) override;
+    void hideEvent(QHideEvent *event) override;
+
+signals:
+    void logoutRequested();
+    void canNavigateBackChanged(bool canBack);
+    void homeContentSwitched();
+    
+    
+    void immersiveStateChanged(bool isImmersive);
+    void playerChromeVisibilityChanged(bool visible);
+
+private:
+    void scheduleProfileRefresh();
+    void setupUi();
+    void setupSidebar();
+
+    void showSidebar();
+    void hideSidebar();
+    void applySidebarPosition();
+    void applySidebarPinned(bool pinned);
+    bool isCurrentViewImmersive() const;
+    int sidebarWidthForMode(bool pinned) const;
+    void applySidebarMetrics(bool pinned);
+    void setSidebarAnimationActive(bool active);
+    void applySidebarIcons();
+    void applySidebarCustomVisibility();
+    void syncSidebarVisibility();
+    void openCloudSyncDialog();
+    void setupSearchHistory();
+    void updateSearchCompleter(const QString &text = QString());
+    QString currentSearchServerId() const;
+
+    
+    void pushView(QWidget* view);
+    void resetToView(QWidget* view);
+    void scheduleDeferredInitialLoad(QWidget* view,
+                                     std::function<void()> startLoad);
+
+    QWidget* createDetailView(const QString& itemId, const QString& itemName = "", const MediaItem& seedItem = {});
+    QWidget* createCategoryView(const QString& categoryId, const QString& title = "");
+    QWidget* createLibraryView(const QString& libraryId, const QString& title = "");
+    QWidget* createPersonView(const QString& personId, const QString& personName = "");
+    QWidget* createSearchView(const QString& query);
+    QWidget* createFilteredView(const QString& filterType, const QString& filterValue);
+    QWidget* createPlayerView(const QString& mediaId, const QString& title, const QString& streamUrl, long long startPositionTicks, const QVariant &extraData);
+    QWidget* createSettingsView();
+    QWidget* createManageView(); 
+    
+    
+    QWidget* createSeasonView(const QString& seriesId, const QString& seasonId, const QString& seasonName);
+
+    
+    void launchPlayer(const QString& mediaId, const QString& title, const QString& streamUrl, long long startPositionTicks, const QVariant& extraData);
+
+    XplayerCore* m_core;
+
+    SlidingStackedWidget* m_contentSwitcher = nullptr;
+    bool m_isDestroying = false;
+    QStack<RouteInfo> m_navStack; 
+
+    DashboardView* m_dashboardView = nullptr;
+    FavoritesView* m_favoritesView = nullptr;
+
+    QWidget* m_sidebar = nullptr;
+    QWidget* m_edgeTrigger = nullptr;
+    QGraphicsDropShadowEffect* m_sidebarShadow = nullptr;
+    QPropertyAnimation* m_sidebarAnim = nullptr;
+    QTimer* m_sidebarAutoHideTimer = nullptr;   
+    bool m_sidebarOnRight = false;
+    bool m_sidebarPinned = false;
+    bool m_sidebarPinnedApplied = false;
+    QHBoxLayout* m_contentLayout = nullptr;
+
+    QLabel* m_serverIconLabel = nullptr;
+    QBoxLayout* m_serverInfoLayout = nullptr;
+    QVBoxLayout* m_serverNameLayout = nullptr;
+    QVBoxLayout* m_sidebarFooterActionsLayout = nullptr;
+    ElidedLabel* m_serverNameLabel = nullptr;
+    ElidedLabel* m_serverAddressLabel = nullptr;
+    QLineEdit* m_searchBox = nullptr;
+    QAction* m_searchAction = nullptr;
+    QCompleter* m_searchCompleter = nullptr;
+    QStringListModel* m_searchHistoryModel = nullptr;
+
+    QPushButton* m_btnHome = nullptr;
+    QPushButton* m_btnFavorites = nullptr;
+    QWidget* m_navArea = nullptr;
+    QWidget* m_searchSpacer = nullptr;
+    QListWidget* m_libraryList = nullptr;
+    SmoothScrollController* m_sidebarLibraryScrollController = nullptr;
+
+    QLabel* m_userAvatarLabel = nullptr;
+    QHBoxLayout* m_userInfoLayout = nullptr;
+    ElidedLabel* m_userNameLabel = nullptr;
+    QPushButton* m_btnCloudSync = nullptr;
+    QPushButton* m_btnSettings = nullptr;
+    QPushButton* m_btnManage = nullptr;
+    QPushButton* m_btnDownloads = nullptr;
+    QPushButton* m_btnLogout = nullptr;
+    WebdavProfileStore* m_webdavStore = nullptr;
+
+    std::optional<QCoro::Task<void>> m_pendingProfileRefreshTask;
+    int m_profileRefreshGeneration = 0;
+    QString m_sidebarLibraryServerId;
+    QString m_sidebarLibraryUserId;
+    QString m_lastRouteType;
+};
+
+#endif 

@@ -1,0 +1,71 @@
+# Build directories
+/build/
+/build*/
+/artifacts/
+*.user
+
+# C/C++ build outputs
+*.exe
+*.dll
+*.o
+*.obj
+*.ilk
+*.pdb
+*.suo
+*.lib
+*.a
+*.so
+
+# Qt generated files
+moc_*.cpp
+ui_*.h
+qrc_*.cpp
+
+# Local IDE and language-server state
+.DS_Store
+.vs/
+.vscode/
+.cache/
+compile_commands.json
+
+# Prebuilt local dependencies
+/libs/libmpv/
+/third_party/qcoro/
+/third_party/spdlog/
+
+# Local toolchain downloads
+/tools/
+
+# Release and package outputs
+*.zip
+*.7z
+/dist/
+/release/
+/anzhuang/
+/Xplayer111/
+
+# Local diagnostics and temporary recovery files
+*.log
+*.err
+*.out
+compile_*.txt
+*_red.txt
+*_green.txt
+*_current.txt
+*_run.txt
+*_run.err
+*_test_out.txt
+*_test_err.txt
+tmp_*
+$out
+
+# Local AI assistant state
+.antigravityignore
+.antigravityrules
+.gemini/
+.agents/
+_agents/
+linuxdo_post.md
+/AGENTS.md
+/SESSION_SUMMARY.md
+/docs/superpowers/
