@@ -16,9 +16,22 @@ function Assert-FileContains {
     }
 }
 
+function Assert-FileDoesNotContain {
+    param(
+        [Parameter(Mandatory = $true)][string]$Path,
+        [Parameter(Mandatory = $true)][string]$Pattern,
+        [Parameter(Mandatory = $true)][string]$Message
+    )
+
+    $content = Get-Content -LiteralPath $Path -Raw
+    if ($content -match $Pattern) {
+        throw $Message
+    }
+}
+
 Assert-FileContains -Path 'CMakeLists.txt' `
-    -Pattern 'project\s*\(\s*Xplayer\s+VERSION\s+1\.0\.4\s+LANGUAGES\s+CXX\s*\)' `
-    -Message 'Root CMake project must be named Xplayer.'
+    -Pattern 'project\s*\(\s*Xplayer\s+VERSION\s+\d+\.\d+\.\d+\s+LANGUAGES\s+CXX\s*\)' `
+    -Message 'Root CMake project must be named Xplayer and expose a semantic version.'
 
 Assert-FileContains -Path 'src/XplayerApp/CMakeLists.txt' `
     -Pattern 'set\s*\(\s*XPLAYER_APP_TARGET\s+Xplayer\s*\)' `
@@ -40,9 +53,13 @@ Assert-FileContains -Path 'src/XplayerApp/main.cpp' `
     -Pattern 'kOrganizationName\s*=\s*"Godking"' `
     -Message 'Application organization must use the Godking brand.'
 
-Assert-FileContains -Path 'src/XplayerApp/main.cpp' `
-    -Pattern 'migrateLegacyOrganizationStorage' `
-    -Message 'Brand migration must preserve settings from earlier installations.'
+Assert-FileContains -Path 'LICENSE' `
+    -Pattern 'Copyright \(c\) 2026 Godking' `
+    -Message 'The project license must identify Godking as the copyright holder.'
+
+Assert-FileDoesNotContain -Path 'src/XplayerApp/main.cpp' `
+    -Pattern 'LegacyOrganization|migrateLegacyOrganizationStorage' `
+    -Message 'Application startup must not contain obsolete organization migration code.'
 
 Assert-FileContains -Path 'src/XplayerApp/views/settings/pageabout.cpp' `
     -Pattern 'm_appNameLabel\s*=\s*new QLabel\s*\(\s*qApp->applicationName\(\)' `

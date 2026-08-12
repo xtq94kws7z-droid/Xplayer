@@ -8,6 +8,7 @@
 class XplayerCore;
 class PlayerView;
 class QCloseEvent;
+class QEvent;
 class QParallelAnimationGroup;
 namespace QWK {
 class WidgetWindowAgent;
@@ -29,7 +30,9 @@ public:
 
 private:
     void bindScreenSignals();
+    void syncWindowsShellFullscreen(bool forceDisabled = false);
     void setMacSystemButtonsVisible(bool visible);
+    bool event(QEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
 
     PlayerView* m_playerView = nullptr;

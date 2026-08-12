@@ -1,7 +1,7 @@
 include(GNUInstallDirs)
 
 set(CPACK_PACKAGE_NAME "${PROJECT_NAME}")
-set(CPACK_PACKAGE_VENDOR "Xplayer")
+set(CPACK_PACKAGE_VENDOR "Godking")
 set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY
     "Xplayer desktop client for Emby and Jellyfin media servers")

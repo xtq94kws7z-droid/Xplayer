@@ -175,6 +175,7 @@ private slots:
     void playerWindowLaunchTransitionIsShort();
     void playbackWindowMaximizeButtonUsesDistinctIconAndChineseTooltip();
     void topbarAndBottomMaximizeButtonsShareStateContract();
+    void fullscreenNotifiesWindowsShellButMaximizedDoesNot();
 };
 
 void PosterWallUtilsTest::deduplicatesInSourceOrder()
@@ -1520,6 +1521,16 @@ void PosterWallUtilsTest::topbarAndBottomMaximizeButtonsShareStateContract()
              PlaybackWindowModeUtils::maximizeTooltipText(false));
     QCOMPARE(PlaybackWindowModeUtils::topbarMaximizeTooltipText(true),
              PlaybackWindowModeUtils::maximizeTooltipText(true));
+}
+
+void PosterWallUtilsTest::fullscreenNotifiesWindowsShellButMaximizedDoesNot()
+{
+    QVERIFY(PlaybackWindowModeUtils::shouldNotifyWindowsShellFullscreen(
+        Qt::WindowFullScreen));
+    QVERIFY(!PlaybackWindowModeUtils::shouldNotifyWindowsShellFullscreen(
+        Qt::WindowMaximized));
+    QVERIFY(!PlaybackWindowModeUtils::shouldNotifyWindowsShellFullscreen(
+        Qt::WindowNoState));
 }
 
 QTEST_MAIN(PosterWallUtilsTest)

@@ -6,6 +6,7 @@
 #include <QRect>
 #include <QSize>
 #include <QCloseEvent>
+#include <QEvent>
 #include <QEasingCurve>
 #include <QParallelAnimationGroup>
 #include <QPropertyAnimation>
@@ -175,8 +176,32 @@ void PlayerWindow::setMacSystemButtonsVisible(bool visible)
 #endif
 }
 
+void PlayerWindow::syncWindowsShellFullscreen(bool forceDisabled)
+{
+    PlaybackWindowModeUtils::notifyWindowsShellFullscreen(
+        winId(), !forceDisabled &&
+                     PlaybackWindowModeUtils::shouldNotifyWindowsShellFullscreen(
+                         windowState()));
+}
+
+bool PlayerWindow::event(QEvent *event)
+{
+    const QEvent::Type type = event->type();
+    const bool handled = QWidget::event(event);
+    if (type == QEvent::WindowStateChange || type == QEvent::Show)
+    {
+        syncWindowsShellFullscreen();
+    }
+    else if (type == QEvent::Hide || type == QEvent::Close)
+    {
+        syncWindowsShellFullscreen(true);
+    }
+    return handled;
+}
+
 void PlayerWindow::closeEvent(QCloseEvent *event)
 {
+    syncWindowsShellFullscreen(true);
     if (m_playerView) {
         m_playerView->prepareForStackLeave();
     }

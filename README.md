@@ -44,15 +44,21 @@ Xplayer 是一款面向 Emby / Jellyfin 用户的现代桌面播放器。它不�
 
 ## 📥 下载
 
-最新版本：**v1.0.4**
+最新版本：**v1.0.5**
 
 | 安装包 | 说明 |
 |---|---|
-| [Xplayer-1.0.4-Setup.exe](https://github.com/xtq94kws7z-droid/Xplayer/releases/download/v1.0.4/Xplayer-1.0.4-Setup.exe) | Windows 10/11 x64 安装包 |
+| [Xplayer-1.0.5-Setup.exe](https://github.com/xtq94kws7z-droid/Xplayer/releases/download/v1.0.5/Xplayer-1.0.5-Setup.exe) | Windows 10/11 x64 安装包 |
 
 旧版本可以在 [Releases](https://github.com/xtq94kws7z-droid/Xplayer/releases) 页面下载。
 
-## 🚀 v1.0.4 更新内容
+## 🚀 v1.0.5 更新内容
+
+- 修复播放器全屏后 Windows 任务栏仍然覆盖画面的问题。
+- 统一 Xplayer 的作者、许可证、安装器发布者和 Windows 文件元数据。
+- 更新项目展示截图，并移除仓库中不再使用的旧截图资源。
+
+### 历史版本 1.0.4
 
 - 针对首页海报墙、媒体列表和详情页滚动进行专项流畅度优化。
 - 改进海报、背景图与演员图片的异步加载、缓存和渐进显示体验。
@@ -194,7 +200,7 @@ Xplayer/
 
 ## 📄 许可证
 
-本项目基于 [MIT 许可证](LICENSE) 开源。
+Xplayer 由 **Godking** 独立开发，基于 [MIT 许可证](LICENSE) 开源。
 
 ## 🙏 致谢
 
@@ -225,15 +231,21 @@ Xplayer is a modern desktop client for Emby and Jellyfin. Built natively with **
 
 ## 📥 Download
 
-Latest release: **v1.0.4**
+Latest release: **v1.0.5**
 
 | Package | Description |
 |---|---|
-| [Xplayer-1.0.4-Setup.exe](https://github.com/xtq94kws7z-droid/Xplayer/releases/download/v1.0.4/Xplayer-1.0.4-Setup.exe) | Windows 10/11 x64 installer |
+| [Xplayer-1.0.5-Setup.exe](https://github.com/xtq94kws7z-droid/Xplayer/releases/download/v1.0.5/Xplayer-1.0.5-Setup.exe) | Windows 10/11 x64 installer |
 
 Older releases are available on the [Releases](https://github.com/xtq94kws7z-droid/Xplayer/releases) page.
 
-## 🚀 What's New in v1.0.4
+## 🚀 What's New in v1.0.5
+
+- Fixed the Windows taskbar remaining visible over fullscreen playback.
+- Unified Xplayer authorship, licensing, installer publisher, and Windows file metadata.
+- Updated repository screenshots and removed obsolete screenshot assets.
+
+### Previous release 1.0.4
 
 - Targeted smoothness improvements for the home poster wall, media lists, and detail-page scrolling.
 - Improved asynchronous loading, caching, and progressive display for posters, backdrops, and cast images.
@@ -375,7 +387,7 @@ Xplayer/
 
 ## 📄 License
 
-This project is licensed under the [MIT License](LICENSE).
+Xplayer is independently developed by **Godking** and released under the [MIT License](LICENSE).
 
 ## 🙏 Acknowledgements
 

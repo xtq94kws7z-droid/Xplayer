@@ -18,7 +18,7 @@ $BuildDir = if ($BuildDir) {
 $OutputDir = Resolve-XplayerInstallerOutput -ProjectRoot $projectRoot -OutputDir $OutputDir
 
 $appName = 'Xplayer'
-$publisher = 'Xplayer'
+$publisher = 'Godking'
 $buildBin = Join-Path $BuildDir 'bin'
 $exePath = Join-Path $buildBin 'Xplayer.exe'
 $iconPath = Join-Path $projectRoot 'src\XplayerApp\resources\XplayerApp.ico'

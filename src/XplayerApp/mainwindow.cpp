@@ -13,6 +13,7 @@
 #include "config/config_keys.h"    
 #include "utils/contextmenuutils.h"
 #include "utils/detailcacheutils.h"
+#include "utils/playbackwindowmodeutils.h"
 #include "utils/uianimationdefaults.h"
 #include "utils/xplayerresponsiveutils.h"
 #include <services/manager/servermanager.h>
@@ -771,10 +772,19 @@ void MainWindow::resizeEvent(QResizeEvent *event)
 
 bool MainWindow::event(QEvent *event)
 {
+    const QEvent::Type eventType = event->type();
     const bool screenMetricsChanged =
-        event->type() == QEvent::ScreenChangeInternal ||
-        event->type() == QEvent::DevicePixelRatioChange;
+        eventType == QEvent::ScreenChangeInternal ||
+        eventType == QEvent::DevicePixelRatioChange;
     const bool handled = QMainWindow::event(event);
+    if (eventType == QEvent::WindowStateChange || eventType == QEvent::Show) {
+        PlaybackWindowModeUtils::notifyWindowsShellFullscreen(
+            winId(),
+            PlaybackWindowModeUtils::shouldNotifyWindowsShellFullscreen(
+                windowState()));
+    } else if (eventType == QEvent::Hide || eventType == QEvent::Close) {
+        PlaybackWindowModeUtils::notifyWindowsShellFullscreen(winId(), false);
+    }
     if (screenMetricsChanged) {
         QTimer::singleShot(0, this, [this]() {
             applyResponsiveLayout();
