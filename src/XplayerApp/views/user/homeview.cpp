@@ -155,6 +155,23 @@ PlayerView *HomeView::activePlayerView() const
     return nullptr;
 }
 
+bool HomeView::isDashboardPosterWallReady() const
+{
+    return m_dashboardView && m_dashboardView->isHeroPosterWallReady();
+}
+
+bool HomeView::isDashboardPosterWallResolved() const
+{
+    return m_dashboardView && m_dashboardView->isHeroPosterWallResolved();
+}
+
+void HomeView::prepareDashboardPosterWall()
+{
+    if (m_dashboardView) {
+        m_dashboardView->prepareHeroPosterWall();
+    }
+}
+
 void HomeView::setupUi()
 {
     this->setProperty("showGlobalSearch", true);
@@ -180,6 +197,11 @@ void HomeView::setupUi()
     m_dashboardView->setProperty("preferSnapshotTransition", true);
     m_dashboardView->setProperty("pinSnapshotTransition", true);
     m_favoritesView->setProperty("preferSnapshotTransition", true);
+
+    connect(m_dashboardView, &DashboardView::heroPosterWallReady, this,
+            &HomeView::dashboardPosterWallReady);
+    connect(m_dashboardView, &DashboardView::heroPosterWallUnavailable, this,
+            &HomeView::dashboardPosterWallUnavailable);
 
     connect(m_dashboardView, &DashboardView::navigateToLibrary, this,
             [this](const QString &id, const QString &name)

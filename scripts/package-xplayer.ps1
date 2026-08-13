@@ -140,12 +140,12 @@ Name: "chinesesimplified"; MessagesFile: "compiler:Languages\ChineseSimplified.i
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "{#BuildBin}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs restartreplace; Excludes: "*.lnk,lib?EmbyCore.dll,Qt6Test.dll,*_test.exe,playedhistory_probe.exe"
+Source: "{#BuildBin}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs restartreplace; Excludes: "*.lnk,lib?EmbyCore.dll,Qt6Test.dll,*_test.exe*,playedhistory_probe.exe*"
 
 [InstallDelete]
 Type: files; Name: "{app}\Qt6Test.dll"
-Type: files; Name: "{app}\*_test.exe"
-Type: files; Name: "{app}\playedhistory_probe.exe"
+Type: files; Name: "{app}\*_test.exe*"
+Type: files; Name: "{app}\playedhistory_probe.exe*"
 
 [Icons]
 Name: "{group}\Xplayer"; Filename: "{app}\Xplayer.exe"; WorkingDir: "{app}"; IconFilename: "{app}\Xplayer.exe"

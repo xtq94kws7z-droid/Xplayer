@@ -53,6 +53,7 @@ class MainWindow : public QMainWindow
         QStackedWidget *m_viewStack;
         LoginView *m_loginView;
         HomeView *m_homeView = nullptr;
+        bool m_homeNavigationPending = false;
         QWK::WidgetWindowAgent *m_windowAgent = nullptr;
         QLineEdit *m_globalSearchBox;
         QCompleter *m_globalSearchCompleter = nullptr;

@@ -12,6 +12,7 @@ private slots:
     void scrollingDefersNonPriorityImageNotificationsUntilIdle();
     void setItemsSkipsVisualRefreshWhenDisplayDataIsUnchanged();
     void setItemsRefreshesOnlyChangedDisplayRows();
+    void preloadedPosterIsAvailableOnFirstRead();
 };
 
 void MediaListModelTest::cacheHitUpdatesUsageWithoutReorderingStorage()
@@ -127,6 +128,26 @@ void MediaListModelTest::setItemsRefreshesOnlyChangedDisplayRows()
     const QList<QVariant> signal = dataChangedSpy.takeFirst();
     QCOMPARE(signal.at(0).toModelIndex().row(), 1);
     QCOMPARE(signal.at(1).toModelIndex().row(), 1);
+}
+
+void MediaListModelTest::preloadedPosterIsAvailableOnFirstRead()
+{
+    MediaListModel model(400, nullptr);
+    MediaItem item;
+    item.id = QStringLiteral("cached-poster");
+    item.images.primaryTag = QStringLiteral("poster-tag");
+    model.setItems({item});
+
+    QPixmap poster(24, 36);
+    poster.fill(Qt::magenta);
+    model.setPreloadedPosterPixmaps({{item.id, poster}});
+
+    const QPixmap firstRead =
+        model.data(model.index(0, 0), MediaListModel::PosterPixmapRole)
+            .value<QPixmap>();
+    QVERIFY(!firstRead.isNull());
+    QCOMPARE(firstRead.toImage().pixelColor(0, 0), QColor(Qt::magenta));
+    QVERIFY(model.m_pendingImageRequests.isEmpty());
 }
 
 QTEST_MAIN(MediaListModelTest)

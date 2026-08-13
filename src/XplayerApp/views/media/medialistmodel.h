@@ -29,6 +29,7 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
     void setItems(const QList<MediaItem>& items);
+    void setPreloadedPosterPixmaps(const QHash<QString, QPixmap>& pixmaps);
     void appendItems(const QList<MediaItem>& items);
     MediaItem getItem(const QModelIndex& index) const;
     const MediaItem* itemAt(int row) const;

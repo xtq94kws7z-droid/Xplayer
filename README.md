@@ -44,21 +44,22 @@ Xplayer 是一款面向 Emby / Jellyfin 用户的现代桌面播放器。它不�
 
 ## 📥 下载
 
-最新版本：**v1.0.6**
+最新版本：**v1.0.7**
 
 | 安装包 | 说明 |
 |---|---|
-| [Xplayer-1.0.6-Setup.exe](https://github.com/xtq94kws7z-droid/Xplayer/releases/download/v1.0.6/Xplayer-1.0.6-Setup.exe) | Windows 10/11 x64 安装包 |
+| [Xplayer-1.0.7-Setup.exe](https://github.com/xtq94kws7z-droid/Xplayer/releases/download/v1.0.7/Xplayer-1.0.7-Setup.exe) | Windows 10/11 x64 安装包 |
 
 旧版本可以在 [Releases](https://github.com/xtq94kws7z-droid/Xplayer/releases) 页面下载。
 
-## 🚀 v1.0.6 更新内容
+## 🚀 v1.0.7 更新内容
 
-- 海报墙改为从整个媒体库随机抽取作品，不再使用观看历史作为来源。
-- 海报墙在一次启动期间保持稳定，返回主页不会重新抽取作品。
-- 自动补齐海报墙简介，并在固定面板尺寸内智能精简显示，悬停可查看完整简介。
-- 修复海报墙切换按钮的圆角、图标居中和响应式尺寸问题。
-- 限制海报墙候选数量和详情请求数量，降低启动时的网络与内存负载。
+- 加固海报墙随机抽取流程，确保作品来自整个媒体库而不是观看历史。
+- 增加启动快照，返回主页不会重复刷新或重新抽取作品。
+- 增加简介补全、缺失简介兜底和固定面板内的精简显示。
+- 修复海报墙切换按钮圆角、图标居中和首页首次显示突兀问题。
+- 限制图片解码、网络响应、候选数量和并发请求，降低内存与启动负载。
+- 增加快照完整性、磁盘容量、路径安全和异步生命周期保护。
 
 ### 历史版本 1.0.5
 
@@ -82,13 +83,12 @@ Xplayer 是一款面向 Emby / Jellyfin 用户的现代桌面播放器。它不�
 - 💬 弹幕播放，支持弹弹Play与 LogVar / danmu_api、搜索、匹配、缓存和原生覆盖层渲染
 - 🧩 支持元数据编辑、媒体识别、图片更新和播放列表管理
 - 📥 下载管理器
-- 🔄 自动检查更新和 Windows 应用内升级
 - 🖥️ 可选单例应用模式
 - 🌗 深色 / 浅色主题切换
 - 🌐 国际化支持（中文 / 英文 / 法语）
 - 🔍 支持搜索历史的媒体搜索
 - 📺 当前支持电视剧、电影媒体类型
-- 📦 提供 Windows 10/11 x64 安装包和绿色便携版
+- 📦 提供 Windows 10/11 x64 安装包
 - ⚡ 基于 C++20 协程的异步操作（QCoro）
 - 🪟 原生风格的自定义窗口边框（QWindowKit）
 
@@ -112,7 +112,6 @@ Xplayer 是一款面向 Emby / Jellyfin 用户的现代桌面播放器。它不�
 - [x] 支持修改元数据和图片
 - [x] 弹幕系统（搜索、匹配、设置、渲染）
 - [x] 下载管理器
-- [x] 自动检查更新和 Windows 应用内升级
 - [x] 单例应用模式
 - [x] 多弹幕源支持（弹弹Play / danmu_api）
 - [ ] AI 字幕生成
@@ -239,21 +238,22 @@ Xplayer is a modern desktop client for Emby and Jellyfin. Built natively with **
 
 ## 📥 Download
 
-Latest release: **v1.0.6**
+Latest release: **v1.0.7**
 
 | Package | Description |
 |---|---|
-| [Xplayer-1.0.6-Setup.exe](https://github.com/xtq94kws7z-droid/Xplayer/releases/download/v1.0.6/Xplayer-1.0.6-Setup.exe) | Windows 10/11 x64 installer |
+| [Xplayer-1.0.7-Setup.exe](https://github.com/xtq94kws7z-droid/Xplayer/releases/download/v1.0.7/Xplayer-1.0.7-Setup.exe) | Windows 10/11 x64 installer |
 
 Older releases are available on the [Releases](https://github.com/xtq94kws7z-droid/Xplayer/releases) page.
 
-## 🚀 What's New in v1.0.6
+## 🚀 What's New in v1.0.7
 
-- Changed the poster wall to sample randomly from the entire media library instead of viewing history.
-- Kept the poster selection stable during a session so returning home does not reshuffle it.
-- Restored poster overviews with compact display text and full-overview tooltips.
-- Fixed circular poster navigation buttons, centered icons, and responsive sizing.
-- Added bounded candidate and detail-request counts to keep startup network and memory usage predictable.
+- Hardened poster-wall sampling so items come from the full media library instead of viewing history.
+- Added a startup snapshot so returning home does not refresh or reshuffle the wall.
+- Added overview enrichment, missing-overview fallback, and compact fixed-panel display.
+- Fixed circular poster navigation buttons, centered icons, and abrupt first-frame display.
+- Bounded image decoding, network responses, candidate counts, and concurrent requests.
+- Added snapshot integrity, disk-capacity, path-safety, and async-lifetime protection.
 
 ### Previous release 1.0.5
 
@@ -277,13 +277,12 @@ Older releases are available on the [Releases](https://github.com/xtq94kws7z-dro
 - 💬 Danmaku playback with DandanPlay and LogVar / danmu_api, search, matching, cache and native overlay rendering
 - 🧩 Metadata editing, media identification, image updates and playlist tools
 - 📥 Download manager
-- 🔄 Automatic update checks and in-app Windows updates
 - 🖥️ Optional single-application mode
 - 🌗 Dark and Light theme support
 - 🌐 Internationalization support (Chinese / English / French)
 - 🔍 Media search with history
 - 📺 TV series and movies media types
-- 📦 Windows 10/11 x64 installer and portable package
+- 📦 Windows 10/11 x64 installer
 - ⚡ Asynchronous operations with C++20 coroutines (QCoro)
 - 🪟 Custom window frame with native look (QWindowKit)
 
@@ -307,7 +306,6 @@ Older releases are available on the [Releases](https://github.com/xtq94kws7z-dro
 - [x] Metadata and image editing
 - [x] Danmaku (bullet comments) system
 - [x] Download manager
-- [x] Automatic update checks and in-app Windows updates
 - [x] Single-application mode
 - [x] Multiple danmaku providers (DandanPlay / danmu_api)
 - [ ] AI-powered subtitle generation

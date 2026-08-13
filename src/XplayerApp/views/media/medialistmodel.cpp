@@ -493,6 +493,28 @@ void MediaListModel::setItems(const QList<MediaItem>& newItems) {
     endResetModel();
 }
 
+void MediaListModel::setPreloadedPosterPixmaps(
+    const QHash<QString, QPixmap>& pixmaps)
+{
+    QSet<QString> itemIds;
+    itemIds.reserve(m_items.size());
+    for (const MediaItem& item : std::as_const(m_items)) {
+        itemIds.insert(item.id);
+    }
+
+    for (auto it = pixmaps.constBegin(); it != pixmaps.constEnd(); ++it) {
+        if (!itemIds.contains(it.key()) || it.value().isNull()) {
+            continue;
+        }
+        removeCachedImage(it.key());
+        m_imageCache.insert(it.key(), it.value());
+        m_imageCacheCostBytes += PixmapCacheBudgetUtils::costBytes(it.value());
+        touchCachedImage(it.key());
+        m_failedImageItems.remove(it.key());
+    }
+    trimImageCache();
+}
+
 void MediaListModel::appendItems(const QList<MediaItem>& items)
 {
     if (items.isEmpty()) {

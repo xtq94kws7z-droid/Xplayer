@@ -1067,6 +1067,19 @@ HomeView* MainWindow::ensureHomeView()
             });
 
     connect(m_homeView, &HomeView::homeContentSwitched, this, [this]() {});
+    connect(m_homeView, &HomeView::dashboardPosterWallReady, this, [this]() {
+        if (m_homeNavigationPending &&
+            m_viewStack->currentWidget() == m_loginView) {
+            navigateToHome();
+        }
+    });
+    connect(m_homeView, &HomeView::dashboardPosterWallUnavailable, this,
+            [this]() {
+                if (m_homeNavigationPending &&
+                    m_viewStack->currentWidget() == m_loginView) {
+                    navigateToHome();
+                }
+            });
     connect(m_homeView, &HomeView::logoutRequested, this,
             &MainWindow::navigateToLogin);
 
@@ -1078,6 +1091,12 @@ void MainWindow::navigateToHome()
     if (!ensureHomeView()) {
         return;
     }
+    if (!m_homeView->isDashboardPosterWallResolved()) {
+        m_homeNavigationPending = true;
+        m_homeView->prepareDashboardPosterWall();
+        return;
+    }
+    m_homeNavigationPending = false;
 
     
     m_homeView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -1215,6 +1234,7 @@ void MainWindow::navigateToHome()
 }
 
 void MainWindow::navigateToLogin() {
+    m_homeNavigationPending = false;
     if (!m_homeView || m_viewStack->currentWidget() != m_homeView) {
         m_viewStack->setCurrentWidget(m_loginView);
         if (m_core && m_core->authService()) {

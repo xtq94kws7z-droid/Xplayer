@@ -20,6 +20,9 @@ QList<MediaItem> mergeUniqueItems(const QList<MediaItem>& resume,
 QList<MediaItem> buildLibraryCandidates(const QList<MediaItem>& libraryItems,
                                         int maxItems);
 
+QList<int> equalLibrarySampleQuotas(int libraryCount, int totalLimit,
+                                    int perLibraryLimit);
+
 QList<MediaItem> selectRandomItems(const QList<MediaItem>& candidates,
                                    int maxItems,
                                    const QList<MediaItem>& previous = {},

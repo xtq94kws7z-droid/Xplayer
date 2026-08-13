@@ -94,6 +94,8 @@ private slots:
     void acceptsLibraryItemsWithoutTypeMetadata();
     void filtersNonPosterMediaTypes();
     void capsMediaLibraryCandidates();
+    void distributesPosterSampleBudgetAcrossLibraries();
+    void capsPosterSampleBudgetPerLibrary();
     void randomlySelectsFromTheWholePosterPool();
     void randomSelectionPrefersItemsWithOverview();
     void itemDetailsEnrichSelectionWithoutReordering();
@@ -152,6 +154,7 @@ private slots:
     void posterStageInfoPanelKeepsStableAnchorAcrossHeroResizes();
     void posterStageControlsFitAtCompactWidth();
     void posterStageOverviewCompactsInsideFixedPanel();
+    void posterStageShowsFallbackForMissingOverview();
     void posterStageNavigationButtonsStayCircular();
     void posterStageNavigationIconsAreCentered();
     void posterStagePlayButtonKeepsItsFinalSize();
@@ -328,6 +331,21 @@ void PosterWallUtilsTest::capsMediaLibraryCandidates()
         PosterWallUtils::buildLibraryCandidates(libraryItems, 120);
 
     QCOMPARE(candidates.size(), 120);
+}
+
+void PosterWallUtilsTest::distributesPosterSampleBudgetAcrossLibraries()
+{
+    QCOMPARE(PosterWallUtils::equalLibrarySampleQuotas(5, 120, 40),
+             QList<int>({24, 24, 24, 24, 24}));
+}
+
+void PosterWallUtilsTest::capsPosterSampleBudgetPerLibrary()
+{
+    QCOMPARE(PosterWallUtils::equalLibrarySampleQuotas(2, 120, 40),
+             QList<int>({40, 40}));
+    QCOMPARE(PosterWallUtils::equalLibrarySampleQuotas(7, 10, 40),
+             QList<int>({2, 2, 2, 1, 1, 1, 1}));
+    QVERIFY(PosterWallUtils::equalLibrarySampleQuotas(0, 120, 40).isEmpty());
 }
 
 void PosterWallUtilsTest::randomlySelectsFromTheWholePosterPool()
@@ -1326,6 +1344,21 @@ void PosterWallUtilsTest::posterStageOverviewCompactsInsideFixedPanel()
     QVERIFY(stage.m_overviewLabel->text().size() < item.overview.size());
     QVERIFY(stage.m_overviewLabel->text().endsWith(QStringLiteral("…")));
     QCOMPARE(stage.m_overviewLabel->toolTip(), item.overview);
+}
+
+void PosterWallUtilsTest::posterStageShowsFallbackForMissingOverview()
+{
+    MediaItem item = makeItem(QStringLiteral("poster-empty-overview"),
+                              QStringLiteral("Poster Without Overview"));
+    item.overview.clear();
+
+    PosterStageWidget stage;
+    stage.resize(1280, 360);
+    stage.setItems({item});
+    stage.show();
+    QTest::qWait(20);
+
+    QVERIFY(!stage.m_overviewLabel->text().trimmed().isEmpty());
 }
 
 void PosterWallUtilsTest::posterStageNavigationButtonsStayCircular()

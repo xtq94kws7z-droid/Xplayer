@@ -3,7 +3,10 @@
 
 #include "../baseview.h"
 #include <QColor>
+#include <QHash>
+#include <QImage>
 #include <QList>
+#include <QSharedPointer>
 #include <QStringList>
 #include <functional>
 #include <qcorotask.h>
@@ -26,15 +29,18 @@ class DashboardView : public BaseView
     Q_OBJECT
 public:
     explicit DashboardView(XplayerCore* core, QWidget *parent = nullptr);
-    
-    
+
+    bool isHeroPosterWallReady() const;
+    bool isHeroPosterWallResolved() const;
+    void prepareHeroPosterWall();
     QCoro::Task<void> loadDashboardData();
 
 public Q_SLOTS:
     void scrollToTop() override;
 
 Q_SIGNALS:
-    
+    void heroPosterWallReady();
+    void heroPosterWallUnavailable();
     void navigateToLibrary(const QString& libraryId, const QString& libraryName);
 
 protected:
@@ -55,23 +61,39 @@ protected:
     bool eventFilter(QObject* obj, QEvent* event) override;
 
 private:
+    struct PosterWallLoadState;
+    struct PosterWallSnapshotBuildState;
+
     void launchDashboardTask(QCoro::Task<void>&& task);
     void scheduleDashboardReload(int delayMs = -1);
     void setupUi();
     void applyDashboardSectionOrder();
     QStringList dashboardSectionOrder() const;
     QString currentServerId() const;
+    QString currentUserId() const;
     QString currentDashboardContextKey() const;
     QWidget* sectionWidgetForId(const QString& sectionId) const;
     void clearLibraryGallerySections();
     void clearDashboardState(bool resetScrollPositions);
     void resetDashboardScrollPositions();
     void clearDashboardGallery(HorizontalListViewGallery* gallery);
-    void updateHeroPosterWall();
-    void scheduleHeroPosterWallUpdate();
+    bool loadHeroPosterWallSnapshot();
+    void installHeroPosterWallSnapshot(const QList<MediaItem>& items,
+                                       const QHash<QString, QImage>& images);
+    void handleHeroPosterWallPreparationFailure(const QString& contextKey);
     QCoro::Task<void> loadHeroPosterWallCandidates(int generation);
-    QCoro::Task<void> enrichHeroPosterWallItems(
-        QString contextKey, QList<MediaItem> selectedItems);
+    QCoro::Task<QList<MediaItem>> loadHeroPosterWallLibrarySample(
+        QString libraryId, int quota);
+    void launchHeroPosterWallSamples(
+        const QSharedPointer<PosterWallLoadState>& state);
+    void beginHeroPosterWallSnapshotBuild(int generation,
+                                          QList<MediaItem> candidates);
+    QCoro::Task<QPair<MediaItem, QImage>> loadHeroPosterWallSnapshotImage(
+        MediaItem item);
+    void launchHeroPosterWallSnapshotImages(
+        const QSharedPointer<PosterWallSnapshotBuildState>& state);
+    QCoro::Task<void> finalizeHeroPosterWallSnapshot(
+        QSharedPointer<PosterWallSnapshotBuildState> state);
     void commitDashboardUiChange(int generation, std::function<void()> commit);
     void flushDeferredDashboardUiCommits();
     bool isDashboardScrollActive() const;
@@ -111,13 +133,13 @@ private:
     PosterStageWidget* m_posterStage = nullptr;
     MediaListModel* m_heroPosterWallModel = nullptr;
     QColor m_dashboardAtmosphere = QColor(128, 136, 148);
-    QTimer* m_heroPosterWallUpdateTimer = nullptr;
     QTimer* m_dashboardReloadTimer = nullptr;
     QTimer* m_dashboardDeferredLoadTimer = nullptr;
     QTimer* m_dashboardUiCommitTimer = nullptr;
-    QList<MediaItem> m_heroPosterWallLibraryCandidates;
-    bool m_heroPosterWallLibraryReady = false;
     bool m_heroPosterWallInitialized = false;
+    bool m_heroPosterWallResolved = false;
+    int m_heroPosterWallRetryCount = 0;
+    QString m_heroPosterWallRefreshContextKey;
 
     
     QWidget* m_resumeSection = nullptr;

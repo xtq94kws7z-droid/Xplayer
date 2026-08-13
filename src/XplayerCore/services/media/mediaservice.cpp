@@ -45,10 +45,17 @@ namespace
     constexpr int kDecodedImageCacheCostKb = 128 * 1024;
     constexpr int kDecodedImageCacheMaxSingleItemCostKb = 16 * 1024;
     constexpr int kImageTransferTimeoutMs = 30 * 1000;
+    constexpr qint64 kMaxImageResponseBytes = 32LL * 1024 * 1024;
     constexpr int kMaxInvalidatedImageRequestVersions = 1024;
     constexpr qint64 kSlowImageRequestThresholdMs = 500;
     constexpr int kImageWidthBuckets[] = {
         160, 240, 320, 480, 640, 768, 1024, 1280, 1920};
+
+    struct BoundedImageResponse
+    {
+        QByteArray data;
+        bool exceeded = false;
+    };
 
     bool verboseMediaServiceLoggingEnabled()
     {
@@ -691,7 +698,8 @@ QCoro::Task<QPixmap> MediaService::fetchImage(QString itemId,
                                               int maxWidth, int imageIndex,
                                               ImageRequestPriority priority,
                                               QObject *requestContext,
-                                              ImageFetchPolicy fetchPolicy)
+                                              ImageFetchPolicy fetchPolicy,
+                                              bool enforceMaxWidth)
 {
     ServerProfile profile = m_serverManager->activeProfile();
     if (!profile.isValid())
@@ -706,14 +714,11 @@ QCoro::Task<QPixmap> MediaService::fetchImage(QString itemId,
 
     
     QString quality = ConfigStore::instance()->get<QString>(ConfigKeys::ImageQuality, "high");
-    int effectiveMaxWidth = maxWidth;
-    if (quality == "low")
-        effectiveMaxWidth = maxWidth / 2;
-    else if (quality == "medium")
-        effectiveMaxWidth = maxWidth * 3 / 4;
-    else if (quality == "original")
-        effectiveMaxWidth = 0; 
-    effectiveMaxWidth = bucketImageWidth(effectiveMaxWidth);
+    int effectiveMaxWidth = ImageCacheBudgetUtils::effectiveMaxWidth(
+        maxWidth, quality, enforceMaxWidth);
+    if (!enforceMaxWidth) {
+        effectiveMaxWidth = bucketImageWidth(effectiveMaxWidth);
+    }
 
     const QString trimmedItemId = itemId.trimmed();
     const QString trimmedImageType = imageType.trimmed();
@@ -1014,6 +1019,28 @@ QCoro::Task<QPixmap> MediaService::fetchImage(QString itemId,
     networkTimer.start();
     QNetworkReply *reply = m_imageManager->get(request);
     QPointer<QNetworkReply> replyGuard(reply);
+    auto responseBuffer = QSharedPointer<BoundedImageResponse>::create();
+    auto drainResponse = [reply, replyGuard, responseBuffer]() {
+        constexpr qint64 kReadChunkBytes = 64 * 1024;
+        while (replyGuard && reply->bytesAvailable() > 0) {
+            const qint64 remaining =
+                kMaxImageResponseBytes - responseBuffer->data.size();
+            if (remaining <= 0) {
+                responseBuffer->exceeded = true;
+                reply->abort();
+                return;
+            }
+            const QByteArray chunk = reply->read(
+                qMin(kReadChunkBytes, remaining + 1));
+            if (chunk.size() > remaining) {
+                responseBuffer->exceeded = true;
+                reply->abort();
+                return;
+            }
+            responseBuffer->data.append(chunk);
+        }
+    };
+    QObject::connect(reply, &QNetworkReply::readyRead, reply, drainResponse);
     if (requestContextGuard)
     {
         QObject::connect(
@@ -1042,6 +1069,7 @@ QCoro::Task<QPixmap> MediaService::fetchImage(QString itemId,
     NetworkManager::attachReplyHandlers(reply, requestOptions,
                                         QStringLiteral("GET_IMAGE"));
     co_await reply;
+    drainResponse();
     if (!serviceGuard || !replyGuard)
     {
         sharedPromise.addResult(QImage());
@@ -1056,9 +1084,22 @@ QCoro::Task<QPixmap> MediaService::fetchImage(QString itemId,
     QImage decodedImage;
     qint64 decodeElapsedMs = 0;
     int imageBytes = 0;
-    if (reply->error() == QNetworkReply::NoError)
+    if (responseBuffer->exceeded)
     {
-        QByteArray data = reply->readAll();
+        qWarning() << "[MediaService] fetchImage response exceeds memory budget";
+    }
+    else if (reply->error() == QNetworkReply::NoError)
+    {
+        const qint64 contentLength = reply->header(
+            QNetworkRequest::ContentLengthHeader).toLongLong();
+        if (contentLength > kMaxImageResponseBytes) {
+            qWarning() << "[MediaService] fetchImage response exceeds memory budget"
+                       << "| bytes=" << contentLength;
+            sharedPromise.addResult(QImage());
+            sharedPromise.finish();
+            co_return QPixmap();
+        }
+        QByteArray data = std::move(responseBuffer->data);
         imageBytes = data.size();
         
         
@@ -1067,11 +1108,24 @@ QCoro::Task<QPixmap> MediaService::fetchImage(QString itemId,
         QElapsedTimer decodeTimer;
         decodeTimer.start();
         auto future = QtConcurrent::run(
-            [data = std::move(data)]() mutable
+            [data = std::move(data), effectiveMaxWidth]() mutable
             {
-                QImage decoded;
-                decoded.loadFromData(data);
-                return decoded;
+                QBuffer buffer(&data);
+                if (!buffer.open(QIODevice::ReadOnly)) {
+                    return QImage {};
+                }
+                QImageReader reader(&buffer);
+                if (effectiveMaxWidth > 0) {
+                    const QSize sourceSize = reader.size();
+                    const QSize decodeSize =
+                        ImageCacheBudgetUtils::decodeSizeForMaxWidth(
+                            sourceSize, effectiveMaxWidth);
+                    reader.setScaledSize(
+                        decodeSize.isValid()
+                            ? decodeSize
+                            : QSize(effectiveMaxWidth, effectiveMaxWidth * 2));
+                }
+                return reader.read();
             });
         decodedImage = co_await future;
         decodeElapsedMs = decodeTimer.elapsed();

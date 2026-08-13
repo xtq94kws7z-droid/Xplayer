@@ -208,6 +208,26 @@ QList<MediaItem> buildLibraryCandidates(const QList<MediaItem>& libraryItems,
                             maxItems);
 }
 
+QList<int> equalLibrarySampleQuotas(int libraryCount, int totalLimit,
+                                    int perLibraryLimit)
+{
+    if (libraryCount <= 0 || totalLimit <= 0 || perLibraryLimit <= 0) {
+        return {};
+    }
+
+    QList<int> quotas(libraryCount, 0);
+    int remaining = qMin(totalLimit, libraryCount * perLibraryLimit);
+    for (int index = 0; index < libraryCount && remaining > 0; ++index) {
+        const int librariesRemaining = libraryCount - index;
+        const int quota = qMin(
+            perLibraryLimit,
+            (remaining + librariesRemaining - 1) / librariesRemaining);
+        quotas[index] = quota;
+        remaining -= quota;
+    }
+    return quotas;
+}
+
 QList<MediaItem> selectRandomItems(const QList<MediaItem>& candidates,
                                    int maxItems,
                                    const QList<MediaItem>& previous,

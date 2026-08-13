@@ -45,6 +45,47 @@ target_link_libraries(posterwallutils_test PRIVATE
 
 add_test(NAME posterwallutils_test COMMAND posterwallutils_test)
 
+add_executable(posterwallsnapshotstore_test
+    posterwallsnapshotstore_test.cpp
+    ${CMAKE_SOURCE_DIR}/src/XplayerApp/utils/posterwallsnapshotstore.cpp
+)
+
+target_include_directories(posterwallsnapshotstore_test PRIVATE
+    ${CMAKE_SOURCE_DIR}/src/XplayerApp
+    ${CMAKE_SOURCE_DIR}/src/XplayerCore
+)
+
+target_link_libraries(posterwallsnapshotstore_test PRIVATE
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Gui
+    Qt${QT_VERSION_MAJOR}::Test
+    XplayerCore
+)
+
+add_test(NAME posterwallsnapshotstore_test COMMAND posterwallsnapshotstore_test)
+
+add_executable(posterwallpreparationpolicy_test
+    posterwallpreparationpolicy_test.cpp
+    ${CMAKE_SOURCE_DIR}/src/XplayerApp/utils/posterwallpreparationpolicy.cpp
+)
+
+target_include_directories(posterwallpreparationpolicy_test PRIVATE
+    ${CMAKE_SOURCE_DIR}/src/XplayerApp
+)
+
+target_link_libraries(posterwallpreparationpolicy_test PRIVATE
+    Qt${QT_VERSION_MAJOR}::Core
+)
+
+set_target_properties(posterwallpreparationpolicy_test PROPERTIES
+    AUTOMOC OFF
+    AUTOUIC OFF
+    AUTORCC OFF
+)
+
+add_test(NAME posterwallpreparationpolicy_test
+         COMMAND posterwallpreparationpolicy_test)
+
 add_executable(layoutgeometryutils_test
     layoutgeometryutils_test.cpp
     ${CMAKE_SOURCE_DIR}/src/XplayerApp/utils/buttonlayoututils.cpp

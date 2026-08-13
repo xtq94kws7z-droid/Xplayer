@@ -67,6 +67,9 @@ public:
 
     
     PlayerView* activePlayerView() const;
+    bool isDashboardPosterWallReady() const;
+    bool isDashboardPosterWallResolved() const;
+    void prepareDashboardPosterWall();
 
 public Q_SLOTS:
     
@@ -84,6 +87,8 @@ signals:
     void logoutRequested();
     void canNavigateBackChanged(bool canBack);
     void homeContentSwitched();
+    void dashboardPosterWallReady();
+    void dashboardPosterWallUnavailable();
     
     
     void immersiveStateChanged(bool isImmersive);

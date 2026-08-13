@@ -951,11 +951,14 @@ void PosterStageWidget::updateOverlayGeometry()
         meta << item.seriesName.trimmed();
     }
     m_metaLabel->setText(meta.join(QStringLiteral("  ·  ")));
-    const QString fullOverview = item.overview.simplified();
+    const QString sourceOverview = item.overview.simplified();
+    const QString fullOverview = sourceOverview.isEmpty()
+                                     ? tr("暂无简介")
+                                     : sourceOverview;
     m_overviewLabel->setText(compactOverview(
         fullOverview, m_overviewLabel->font(), m_overviewLabel->maximumWidth(),
         m_overviewLabel->height()));
-    m_overviewLabel->setToolTip(fullOverview);
+    m_overviewLabel->setToolTip(sourceOverview);
 }
 
 void PosterStageWidget::updateControls()
