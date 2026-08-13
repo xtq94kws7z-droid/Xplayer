@@ -3,6 +3,7 @@
 #include <functional>
 
 #include <QRegularExpression>
+#include <QRandomGenerator>
 #include <QSet>
 #include <QVector>
 
@@ -182,6 +183,128 @@ QList<MediaItem> mergeUniqueItems(const QList<MediaItem>& resume,
     }
 
     return result;
+}
+
+QList<MediaItem> buildLibraryCandidates(const QList<MediaItem>& libraryItems,
+                                        int maxItems)
+{
+    if (maxItems <= 0) {
+        return {};
+    }
+
+    auto posterItemsOnly = [](const QList<MediaItem>& source) {
+        QList<MediaItem> result;
+        for (const MediaItem& item : source) {
+            const QString type = item.type.trimmed().toCaseFolded();
+            if (type.isEmpty() || type == QLatin1String("movie") ||
+                type == QLatin1String("series")) {
+                result.append(item);
+            }
+        }
+        return result;
+    };
+
+    return mergeUniqueItems(posterItemsOnly(libraryItems), {}, {}, {},
+                            maxItems);
+}
+
+QList<MediaItem> selectRandomItems(const QList<MediaItem>& candidates,
+                                   int maxItems,
+                                   const QList<MediaItem>& previous,
+                                   quint32 seed)
+{
+    if (candidates.isEmpty() || maxItems <= 0) {
+        return {};
+    }
+
+    const int selectionSize = qMin(maxItems, candidates.size());
+    QList<int> shuffledIndices;
+    shuffledIndices.reserve(candidates.size());
+    for (int index = 0; index < candidates.size(); ++index) {
+        shuffledIndices.append(index);
+    }
+
+    auto shuffle = [](QList<int>& indices, quint32 shuffleSeed) {
+        QRandomGenerator localGenerator(shuffleSeed);
+        QRandomGenerator* generator =
+            shuffleSeed == 0 ? QRandomGenerator::global() : &localGenerator;
+        for (int index = indices.size() - 1; index > 0; --index) {
+            const int swapIndex =
+                static_cast<int>(generator->bounded(index + 1));
+            indices.swapItemsAt(index, swapIndex);
+        }
+    };
+
+    auto buildSelection = [&](const QList<int>& indices) {
+        QList<MediaItem> selection;
+        selection.reserve(selectionSize);
+        for (int index = 0; index < selectionSize; ++index) {
+            selection.append(candidates.at(indices.at(index)));
+        }
+        return selection;
+    };
+
+    auto sameSelection = [](const QList<MediaItem>& first,
+                            const QList<MediaItem>& second) {
+        if (first.size() != second.size()) {
+            return false;
+        }
+        for (int index = 0; index < first.size(); ++index) {
+            if (first.at(index).id != second.at(index).id) {
+                return false;
+            }
+        }
+        return true;
+    };
+
+    shuffle(shuffledIndices, seed);
+
+    QList<int> prioritizedIndices;
+    prioritizedIndices.reserve(shuffledIndices.size());
+    for (const int index : std::as_const(shuffledIndices)) {
+        if (!candidates.at(index).overview.trimmed().isEmpty()) {
+            prioritizedIndices.append(index);
+        }
+    }
+    for (const int index : std::as_const(shuffledIndices)) {
+        if (candidates.at(index).overview.trimmed().isEmpty()) {
+            prioritizedIndices.append(index);
+        }
+    }
+
+    QList<MediaItem> selection = buildSelection(prioritizedIndices);
+    if (sameSelection(selection, previous) && candidates.size() > selectionSize) {
+        prioritizedIndices.swapItemsAt(0, selectionSize);
+        selection = buildSelection(prioritizedIndices);
+    }
+    return selection;
+}
+
+QList<MediaItem> enrichItemDetails(const QList<MediaItem>& selected,
+                                   const QList<MediaItem>& details)
+{
+    QHash<QString, MediaItem> detailsById;
+    detailsById.reserve(details.size());
+    for (const MediaItem& detail : details) {
+        const QString id = detail.id.trimmed();
+        if (!id.isEmpty()) {
+            detailsById.insert(id, detail);
+        }
+    }
+
+    QList<MediaItem> enriched = selected;
+    for (MediaItem& item : enriched) {
+        const auto detailIt = detailsById.constFind(item.id.trimmed());
+        if (detailIt == detailsById.cend()) {
+            continue;
+        }
+
+        const QString overview = detailIt->overview.trimmed();
+        if (!overview.isEmpty()) {
+            item.overview = overview;
+        }
+    }
+    return enriched;
 }
 
 int nextIndex(int currentIndex, int itemCount, int direction)

@@ -69,6 +69,9 @@ private:
     void clearDashboardGallery(HorizontalListViewGallery* gallery);
     void updateHeroPosterWall();
     void scheduleHeroPosterWallUpdate();
+    QCoro::Task<void> loadHeroPosterWallCandidates(int generation);
+    QCoro::Task<void> enrichHeroPosterWallItems(
+        QString contextKey, QList<MediaItem> selectedItems);
     void commitDashboardUiChange(int generation, std::function<void()> commit);
     void flushDeferredDashboardUiCommits();
     bool isDashboardScrollActive() const;
@@ -112,6 +115,9 @@ private:
     QTimer* m_dashboardReloadTimer = nullptr;
     QTimer* m_dashboardDeferredLoadTimer = nullptr;
     QTimer* m_dashboardUiCommitTimer = nullptr;
+    QList<MediaItem> m_heroPosterWallLibraryCandidates;
+    bool m_heroPosterWallLibraryReady = false;
+    bool m_heroPosterWallInitialized = false;
 
     
     QWidget* m_resumeSection = nullptr;

@@ -7,6 +7,7 @@
 #include <QByteArray>
 #include <qcorotask.h>
 #include <QJsonArray>
+#include <QList>
 #include <QUrlQuery>
 
 class XPLAYERCORE_EXPORT ApiClient : public QObject {
@@ -16,6 +17,7 @@ public:
 
     
     QCoro::Task<QJsonObject> get(const QString& path);
+    QCoro::Task<QList<QJsonObject>> getBatch(const QStringList& paths);
     QCoro::Task<QString> getText(const QString& path);
     QCoro::Task<QJsonObject> post(const QString& path, const QJsonObject& payload);
     QCoro::Task<QJsonObject> postArray(const QString& path, const QJsonArray& payload);

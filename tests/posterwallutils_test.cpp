@@ -90,6 +90,14 @@ private slots:
     void deduplicatesSharedArtworkAcrossDifferentItems();
     void deduplicatesSameTitleAcrossDifferentArtworkIds();
     void capsThePosterPool();
+    void libraryCandidatesStayWithinTheLibrary();
+    void acceptsLibraryItemsWithoutTypeMetadata();
+    void filtersNonPosterMediaTypes();
+    void capsMediaLibraryCandidates();
+    void randomlySelectsFromTheWholePosterPool();
+    void randomSelectionPrefersItemsWithOverview();
+    void itemDetailsEnrichSelectionWithoutReordering();
+    void avoidsRepeatingThePreviousPosterSelection();
     void wrapsSelectionForwardAndBackward();
     void listsVisiblePosterIndicesInOrder();
     void returnsNeutralColorForEmptyImage();
@@ -143,6 +151,9 @@ private slots:
     void posterStageInfoPanelKeepsStableGeometryAcrossItems();
     void posterStageInfoPanelKeepsStableAnchorAcrossHeroResizes();
     void posterStageControlsFitAtCompactWidth();
+    void posterStageOverviewCompactsInsideFixedPanel();
+    void posterStageNavigationButtonsStayCircular();
+    void posterStageNavigationIconsAreCentered();
     void posterStagePlayButtonKeepsItsFinalSize();
     void playedHistoryUsesServerSafePage();
     void playedHistoryClampsLargeInitialRequests();
@@ -251,6 +262,169 @@ void PosterWallUtilsTest::capsThePosterPool()
 
     QCOMPARE(items.size(), 3);
     QCOMPARE(items.at(2).id, QStringLiteral("c"));
+}
+
+void PosterWallUtilsTest::libraryCandidatesStayWithinTheLibrary()
+{
+    QList<MediaItem> libraryItems;
+    for (int index = 0; index < 20; ++index) {
+        MediaItem item = makeItem(QStringLiteral("library-%1").arg(index),
+                                  QStringLiteral("Library %1").arg(index));
+        item.type = QStringLiteral("Movie");
+        libraryItems.append(item);
+    }
+    const QList<MediaItem> candidates =
+        PosterWallUtils::buildLibraryCandidates(libraryItems, 120);
+
+    QCOMPARE(candidates.size(), 20);
+    for (const MediaItem& item : candidates) {
+        QVERIFY2(item.id.startsWith(QStringLiteral("library-")),
+                 "History items must not displace a sufficiently large library.");
+    }
+}
+
+void PosterWallUtilsTest::acceptsLibraryItemsWithoutTypeMetadata()
+{
+    const MediaItem item = makeItem(QStringLiteral("library-unknown-type"),
+                                    QStringLiteral("Library item"));
+
+    const QList<MediaItem> candidates =
+        PosterWallUtils::buildLibraryCandidates({item}, 18);
+
+    QCOMPARE(candidates.size(), 1);
+    QCOMPARE(candidates.first().id, QStringLiteral("library-unknown-type"));
+}
+
+void PosterWallUtilsTest::filtersNonPosterMediaTypes()
+{
+    QList<MediaItem> libraryItems;
+    MediaItem movie = makeItem(QStringLiteral("movie"), QStringLiteral("Movie"));
+    movie.type = QStringLiteral("Movie");
+    MediaItem episode = makeItem(QStringLiteral("episode"),
+                                 QStringLiteral("Episode"));
+    episode.type = QStringLiteral("Episode");
+    MediaItem folder = makeItem(QStringLiteral("folder"), QStringLiteral("Folder"));
+    folder.type = QStringLiteral("Folder");
+    libraryItems << movie << episode << folder;
+
+    const QList<MediaItem> candidates =
+        PosterWallUtils::buildLibraryCandidates(libraryItems, 18);
+
+    QCOMPARE(candidates.size(), 1);
+    QCOMPARE(candidates.first().id, QStringLiteral("movie"));
+}
+
+void PosterWallUtilsTest::capsMediaLibraryCandidates()
+{
+    QList<MediaItem> libraryItems;
+    for (int index = 0; index < 150; ++index) {
+        MediaItem item = makeItem(QStringLiteral("library-%1").arg(index),
+                                  QStringLiteral("Library %1").arg(index));
+        item.type = QStringLiteral("Movie");
+        libraryItems.append(item);
+    }
+
+    const QList<MediaItem> candidates =
+        PosterWallUtils::buildLibraryCandidates(libraryItems, 120);
+
+    QCOMPARE(candidates.size(), 120);
+}
+
+void PosterWallUtilsTest::randomlySelectsFromTheWholePosterPool()
+{
+    QList<MediaItem> candidates;
+    for (int index = 0; index < 10; ++index) {
+        candidates.append(makeItem(QStringLiteral("poster-%1").arg(index),
+                                   QStringLiteral("Poster %1").arg(index)));
+    }
+
+    const QList<MediaItem> selected = PosterWallUtils::selectRandomItems(
+        candidates, 3, {}, 17);
+
+    QCOMPARE(selected.size(), 3);
+    QStringList selectedIds;
+    QStringList firstCandidateIds;
+    QStringList repeatedIds;
+    for (const MediaItem& item : selected) {
+        selectedIds.append(item.id);
+    }
+    for (const MediaItem& item : candidates.mid(0, 3)) {
+        firstCandidateIds.append(item.id);
+    }
+    for (const MediaItem& item :
+         PosterWallUtils::selectRandomItems(candidates, 3, {}, 17)) {
+        repeatedIds.append(item.id);
+    }
+
+    QVERIFY(selectedIds != firstCandidateIds);
+    QCOMPARE(repeatedIds, selectedIds);
+}
+
+void PosterWallUtilsTest::randomSelectionPrefersItemsWithOverview()
+{
+    QList<MediaItem> candidates;
+    for (int index = 0; index < 6; ++index) {
+        MediaItem item = makeItem(QStringLiteral("poster-%1").arg(index),
+                                  QStringLiteral("Poster %1").arg(index));
+        if (index >= 3) {
+            item.overview = QStringLiteral("Overview %1").arg(index);
+        }
+        candidates.append(item);
+    }
+
+    const QList<MediaItem> selected = PosterWallUtils::selectRandomItems(
+        candidates, 3, {}, 17);
+
+    QCOMPARE(selected.size(), 3);
+    for (const MediaItem& item : selected) {
+        QVERIFY(!item.overview.trimmed().isEmpty());
+    }
+}
+
+void PosterWallUtilsTest::itemDetailsEnrichSelectionWithoutReordering()
+{
+    MediaItem first = makeItem(QStringLiteral("first"),
+                               QStringLiteral("First"));
+    MediaItem second = makeItem(QStringLiteral("second"),
+                                QStringLiteral("Second"));
+    MediaItem secondDetail = second;
+    secondDetail.overview = QStringLiteral("Second overview");
+    MediaItem firstDetail = first;
+    firstDetail.overview = QStringLiteral("First overview");
+
+    const QList<MediaItem> enriched = PosterWallUtils::enrichItemDetails(
+        {first, second}, {secondDetail, firstDetail});
+
+    QCOMPARE(enriched.size(), 2);
+    QCOMPARE(enriched.at(0).id, QStringLiteral("first"));
+    QCOMPARE(enriched.at(0).overview, QStringLiteral("First overview"));
+    QCOMPARE(enriched.at(1).id, QStringLiteral("second"));
+    QCOMPARE(enriched.at(1).overview, QStringLiteral("Second overview"));
+}
+
+void PosterWallUtilsTest::avoidsRepeatingThePreviousPosterSelection()
+{
+    QList<MediaItem> candidates;
+    for (int index = 0; index < 10; ++index) {
+        candidates.append(makeItem(QStringLiteral("poster-%1").arg(index),
+                                   QStringLiteral("Poster %1").arg(index)));
+    }
+
+    const QList<MediaItem> previous = PosterWallUtils::selectRandomItems(
+        candidates, 3, {}, 17);
+    const QList<MediaItem> next = PosterWallUtils::selectRandomItems(
+        candidates, 3, previous, 17);
+
+    QCOMPARE(next.size(), 3);
+    QStringList previousIds;
+    QStringList nextIds;
+    for (const MediaItem& item : previous) {
+        previousIds.append(item.id);
+    }
+    for (const MediaItem& item : next) {
+        nextIds.append(item.id);
+    }
+    QVERIFY(nextIds != previousIds);
 }
 
 void PosterWallUtilsTest::wrapsSelectionForwardAndBackward()
@@ -1133,6 +1307,63 @@ void PosterWallUtilsTest::posterStageControlsFitAtCompactWidth()
              "The play button must fit its full translated label and style padding.");
     QVERIFY(stage.m_infoPanel->rect().contains(
         stage.m_playButton->geometry().bottomRight()));
+}
+
+void PosterWallUtilsTest::posterStageOverviewCompactsInsideFixedPanel()
+{
+    MediaItem item = makeItem(QStringLiteral("poster-1"),
+                              QStringLiteral("Poster One"));
+    item.overview = QStringLiteral(
+        "这是一个非常漫长的作品简介。主角在失去一切之后踏上旅程，途中遇到了许多伙伴和敌人。"
+        "他们必须面对危险的考验，并在最后做出改变命运的选择。这个故事还会继续展开更多内容。");
+
+    PosterStageWidget stage;
+    stage.resize(1280, 360);
+    stage.setItems({item});
+    stage.show();
+    QTest::qWait(20);
+
+    QVERIFY(stage.m_overviewLabel->text().size() < item.overview.size());
+    QVERIFY(stage.m_overviewLabel->text().endsWith(QStringLiteral("…")));
+    QCOMPARE(stage.m_overviewLabel->toolTip(), item.overview);
+}
+
+void PosterWallUtilsTest::posterStageNavigationButtonsStayCircular()
+{
+    PosterStageWidget stage;
+    stage.resize(1280, 360);
+    stage.setReducedMotion(true);
+    stage.setItems({makeItem(QStringLiteral("poster-1"),
+                             QStringLiteral("Poster One")),
+                    makeItem(QStringLiteral("poster-2"),
+                             QStringLiteral("Poster Two"))});
+    stage.show();
+    QTest::qWait(10);
+
+    QCOMPARE(stage.m_previousButton->size(), stage.m_nextButton->size());
+    const QString expectedRadius = QStringLiteral("border-radius: %1px")
+                                       .arg(stage.m_previousButton->width() / 2);
+    QVERIFY(stage.m_previousButton->styleSheet().contains(expectedRadius));
+    QVERIFY(stage.m_nextButton->styleSheet().contains(expectedRadius));
+}
+
+void PosterWallUtilsTest::posterStageNavigationIconsAreCentered()
+{
+    PosterStageWidget stage;
+    stage.resize(1280, 360);
+    stage.setItems({makeItem(QStringLiteral("poster-1"),
+                             QStringLiteral("Poster One")),
+                    makeItem(QStringLiteral("poster-2"),
+                             QStringLiteral("Poster Two"))});
+    stage.show();
+    QTest::qWait(10);
+
+    QVERIFY(stage.m_previousButton->text().isEmpty());
+    QVERIFY(stage.m_nextButton->text().isEmpty());
+    QVERIFY(!stage.m_previousButton->icon().isNull());
+    QVERIFY(!stage.m_nextButton->icon().isNull());
+    QCOMPARE(stage.m_previousButton->iconSize(),
+             stage.m_nextButton->iconSize());
 }
 
 void PosterWallUtilsTest::posterStagePlayButtonKeepsItsFinalSize()

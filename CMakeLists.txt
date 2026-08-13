@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.19)
 
-project(Xplayer VERSION 1.0.5 LANGUAGES CXX)
+project(Xplayer VERSION 1.0.6 LANGUAGES CXX)
 
 if(APPLE)
     set(CMAKE_OSX_DEPLOYMENT_TARGET 13.0)

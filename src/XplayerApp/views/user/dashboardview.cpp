@@ -30,6 +30,7 @@
 #include <QPainterPath>
 #include <QPointer>
 #include <QPushButton>
+#include <QRandomGenerator>
 #include <QRadialGradient>
 #include <QResizeEvent>
 #include <QScrollArea>
@@ -52,6 +53,7 @@
 namespace {
 
 constexpr int kPosterStageItemLimit = 18;
+constexpr int kPosterStageCandidateLimit = 120;
 constexpr int kHeroPosterWallCoalesceMs = 50;
 constexpr int kDashboardReloadCoalesceMs = 80;
 constexpr int kDashboardUiCommitRetryMs = 64;
@@ -602,6 +604,9 @@ void DashboardView::clearDashboardState(bool resetScrollPositions)
         m_posterStage->setItems({});
         m_posterStage->setVisible(false);
     }
+    m_heroPosterWallLibraryCandidates.clear();
+    m_heroPosterWallLibraryReady = false;
+    m_heroPosterWallInitialized = false;
 
     if (m_resumeSection) {
         m_resumeSection->setVisible(false);
@@ -682,21 +687,193 @@ void DashboardView::updateHeroPosterWall()
         return;
     }
 
-    const QList<MediaItem> wallItems = PosterWallUtils::mergeUniqueItems(
-        m_resumeGallery ? m_resumeGallery->items() : QList<MediaItem> {},
-        m_latestGallery ? m_latestGallery->items() : QList<MediaItem> {},
-        m_recommendGallery ? m_recommendGallery->items() : QList<MediaItem> {},
-        m_completedGallery ? m_completedGallery->items() : QList<MediaItem> {},
-        kPosterStageItemLimit);
+    if (m_heroPosterWallInitialized) {
+        return;
+    }
+
+    if (!m_heroPosterWallLibraryReady) {
+        return;
+    }
+
+    const QList<MediaItem> posterCandidates =
+        m_heroPosterWallLibraryCandidates;
+    if (posterCandidates.isEmpty()) {
+        return;
+    }
+    const QList<MediaItem> previousItems =
+        m_posterStage ? m_posterStage->items() : QList<MediaItem> {};
+    const QList<MediaItem> wallItems = PosterWallUtils::selectRandomItems(
+        posterCandidates, kPosterStageItemLimit, previousItems);
+    if (wallItems.isEmpty()) {
+        return;
+    }
 
     m_heroPosterWallModel->setItems(wallItems);
     m_posterStage->setItems(wallItems);
-    m_posterStage->setVisible(!wallItems.isEmpty());
+    m_posterStage->setVisible(true);
+    m_heroPosterWallInitialized = true;
+    launchDashboardTask(enrichHeroPosterWallItems(
+        currentDashboardContextKey(), wallItems));
+}
+
+QCoro::Task<void> DashboardView::enrichHeroPosterWallItems(
+    QString contextKey, QList<MediaItem> selectedItems)
+{
+    QPointer<DashboardView> guard(this);
+    auto* mediaService = m_core ? m_core->mediaService() : nullptr;
+    if (!mediaService || contextKey.isEmpty()) {
+        co_return;
+    }
+
+    QStringList missingOverviewIds;
+    for (const MediaItem& item : std::as_const(selectedItems)) {
+        if (item.overview.trimmed().isEmpty() &&
+            !item.id.trimmed().isEmpty()) {
+            missingOverviewIds.append(item.id.trimmed());
+        }
+    }
+    if (missingOverviewIds.isEmpty()) {
+        co_return;
+    }
+
+    QList<MediaItem> details;
+    try {
+        details = co_await mediaService->getItemDetails(missingOverviewIds);
+    } catch (const std::exception& e) {
+        qWarning() << "[DashboardView] poster wall detail fetch failed"
+                   << "| count=" << missingOverviewIds.size()
+                   << "| error=" << e.what();
+        co_return;
+    } catch (...) {
+        qWarning() << "[DashboardView] poster wall detail fetch failed"
+                   << "| count=" << missingOverviewIds.size()
+                   << "| error=unknown";
+        co_return;
+    }
+
+    if (!guard || currentDashboardContextKey() != contextKey ||
+        !m_heroPosterWallInitialized || !m_posterStage ||
+        !m_heroPosterWallModel) {
+        co_return;
+    }
+
+    const QList<MediaItem> currentItems = m_posterStage->items();
+    if (currentItems.size() != selectedItems.size()) {
+        co_return;
+    }
+    for (int index = 0; index < currentItems.size(); ++index) {
+        if (currentItems.at(index).id != selectedItems.at(index).id) {
+            co_return;
+        }
+    }
+
+    const QList<MediaItem> enrichedItems =
+        PosterWallUtils::enrichItemDetails(currentItems, details);
+    if (PosterWallUtils::sameStageItems(currentItems, enrichedItems)) {
+        co_return;
+    }
+
+    m_heroPosterWallModel->setItems(enrichedItems);
+    m_posterStage->setItems(enrichedItems);
+}
+
+QCoro::Task<void> DashboardView::loadHeroPosterWallCandidates(int generation)
+{
+    if (m_heroPosterWallInitialized) {
+        co_return;
+    }
+
+    QPointer<DashboardView> guard(this);
+    auto* mediaService = m_core ? m_core->mediaService() : nullptr;
+    if (!mediaService) {
+        co_return;
+    }
+
+    QList<MediaItem> libraryItems;
+    try {
+        const QList<MediaItem> userViews =
+            co_await mediaService->getUserViews();
+        for (const MediaItem& view : userViews) {
+            if (!guard || m_loadGeneration != generation ||
+                libraryItems.size() >= kPosterStageCandidateLimit) {
+                break;
+            }
+            if (view.id.trimmed().isEmpty()) {
+                continue;
+            }
+
+            try {
+                const int remaining =
+                    kPosterStageCandidateLimit - libraryItems.size();
+                const MediaQueryPage page =
+                    co_await mediaService->getLibraryItemsPage(
+                        view.id, QStringLiteral("Random"),
+                        QStringLiteral("Ascending"), QString(),
+                        QStringLiteral("Movie,Series"), 0,
+                        qMin(40, remaining), true);
+                QList<MediaItem> sampledItems = page.items;
+                if (page.totalRecordCount > sampledItems.size() &&
+                    !sampledItems.isEmpty()) {
+                    const int maxStart = qMax(
+                        0, page.totalRecordCount - sampledItems.size());
+                    const int randomStart =
+                        QRandomGenerator::global()->bounded(maxStart + 1);
+                    const MediaQueryPage randomWindow =
+                        co_await mediaService->getLibraryItemsPage(
+                            view.id, QStringLiteral("SortName"),
+                            QStringLiteral("Ascending"), QString(),
+                            QStringLiteral("Movie,Series"), randomStart,
+                            sampledItems.size(), true);
+                    if (!randomWindow.items.isEmpty()) {
+                        sampledItems = randomWindow.items;
+                    }
+                }
+                libraryItems.append(sampledItems);
+            } catch (const std::exception& e) {
+                qWarning() << "[DashboardView] poster wall library fetch failed"
+                           << "| libraryId=" << view.id
+                           << "| error=" << e.what();
+            } catch (...) {
+                qWarning() << "[DashboardView] poster wall library fetch failed"
+                           << "| libraryId=" << view.id
+                           << "| error=unknown";
+            }
+        }
+    } catch (const std::exception& e) {
+        qWarning() << "[DashboardView] poster wall library discovery failed"
+                   << "| error=" << e.what();
+    } catch (...) {
+        qWarning() << "[DashboardView] poster wall library discovery failed"
+                   << "| error=unknown";
+    }
+
+    if (!guard || m_loadGeneration != generation) {
+        co_return;
+    }
+
+    const QList<MediaItem> candidates =
+        PosterWallUtils::buildLibraryCandidates(libraryItems,
+                                                kPosterStageCandidateLimit);
+    if (candidates.isEmpty()) {
+        qWarning() << "[DashboardView] poster wall returned no usable library"
+                      " movies or series; keeping existing wall"
+                   << "| previousCount="
+                   << m_heroPosterWallLibraryCandidates.size();
+        co_return;
+    }
+
+    m_heroPosterWallLibraryCandidates = candidates;
+    m_heroPosterWallLibraryReady = true;
+    qDebug() << "[DashboardView] poster wall candidates ready"
+             << "| generation=" << generation
+             << "| libraryItems=" << libraryItems.size()
+             << "| uniqueCandidates=" << candidates.size();
+    updateHeroPosterWall();
 }
 
 void DashboardView::scheduleHeroPosterWallUpdate()
 {
-    if (!m_heroPosterWallUpdateTimer ||
+    if (m_heroPosterWallInitialized || !m_heroPosterWallUpdateTimer ||
         m_heroPosterWallUpdateTimer->isActive()) {
         return;
     }
@@ -1237,7 +1414,6 @@ QCoro::Task<void> DashboardView::loadDashboardData()
     }
     m_deferredDashboardUiCommits.clear();
     m_deferredUiCommitGeneration = -1;
-
     const QString contextKey = currentDashboardContextKey();
 
     if (contextKey != m_dashboardContextKey) {
@@ -1334,6 +1510,9 @@ QCoro::Task<void> DashboardView::loadDashboardData()
 
     launchDashboardTask(loadResumeSection(showResume, generation));
     launchDashboardTask(loadRecommendedSection(showRecommended, generation));
+    if (!m_heroPosterWallInitialized) {
+        launchDashboardTask(loadHeroPosterWallCandidates(generation));
+    }
 
     const bool deferLatest = showLatest;
     const bool deferCompleted = showCompleted;

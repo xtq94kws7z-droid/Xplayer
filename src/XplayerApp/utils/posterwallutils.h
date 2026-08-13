@@ -17,6 +17,17 @@ QList<MediaItem> mergeUniqueItems(const QList<MediaItem>& resume,
                                   const QList<MediaItem>& completed,
                                   int maxItems);
 
+QList<MediaItem> buildLibraryCandidates(const QList<MediaItem>& libraryItems,
+                                        int maxItems);
+
+QList<MediaItem> selectRandomItems(const QList<MediaItem>& candidates,
+                                   int maxItems,
+                                   const QList<MediaItem>& previous = {},
+                                   quint32 seed = 0);
+
+QList<MediaItem> enrichItemDetails(const QList<MediaItem>& selected,
+                                   const QList<MediaItem>& details);
+
 int nextIndex(int currentIndex, int itemCount, int direction);
 
 QList<int> visibleIndices(int currentIndex, int itemCount, int maxVisible);

@@ -2295,6 +2295,43 @@ QCoro::Task<MediaItem> MediaService::getItemDetail(const QString &itemId)
     co_return item;
 }
 
+QCoro::Task<QList<MediaItem>> MediaService::getItemDetails(
+    const QStringList& itemIds)
+{
+    ensureValidProfile();
+
+    QStringList normalizedIds;
+    normalizedIds.reserve(itemIds.size());
+    for (const QString& itemId : itemIds) {
+        const QString normalizedId = itemId.trimmed();
+        if (!normalizedId.isEmpty() && !normalizedIds.contains(normalizedId)) {
+            normalizedIds.append(normalizedId);
+        }
+    }
+    if (normalizedIds.isEmpty()) {
+        co_return QList<MediaItem> {};
+    }
+
+    const ServerProfile profile = m_serverManager->activeProfile();
+    QStringList paths;
+    paths.reserve(normalizedIds.size());
+    for (const QString& itemId : normalizedIds) {
+        paths.append(QStringLiteral("/Users/%1/Items/%2?Fields=Overview")
+                         .arg(profile.userId, itemId));
+    }
+
+    const QList<QJsonObject> responses =
+        co_await m_serverManager->activeClient()->getBatch(paths);
+    QList<MediaItem> items;
+    items.reserve(responses.size());
+    for (const QJsonObject& response : responses) {
+        if (!response.isEmpty()) {
+            items.append(MediaItem::fromJson(response));
+        }
+    }
+    co_return items;
+}
+
 QCoro::Task<bool> MediaService::toggleFavorite(const QString &itemId, bool isFavorite)
 {
     ensureValidProfile();

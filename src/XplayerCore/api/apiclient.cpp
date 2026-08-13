@@ -46,6 +46,29 @@ QCoro::Task<QString> ApiClient::getText(const QString& path) {
                                           requestOptions());
 }
 
+QCoro::Task<QList<QJsonObject>> ApiClient::getBatch(
+    const QStringList& paths)
+{
+    QList<NetworkJsonGetRequest> requests;
+    requests.reserve(paths.size());
+    for (const QString& path : paths) {
+        NetworkJsonGetRequest request;
+        request.url = m_profile.url + path;
+        request.headers = getAuthHeaders();
+        request.options = requestOptions();
+        requests.append(std::move(request));
+    }
+
+    const QList<NetworkJsonResult> results =
+        co_await m_network->getBatch(std::move(requests));
+    QList<QJsonObject> objects;
+    objects.reserve(results.size());
+    for (const NetworkJsonResult& result : results) {
+        objects.append(result.succeeded() ? result.object : QJsonObject {});
+    }
+    co_return objects;
+}
+
 QCoro::Task<QJsonObject> ApiClient::post(const QString& path, const QJsonObject& payload) {
     QString fullUrl = m_profile.url + path;
     co_return co_await m_network->post(fullUrl, getAuthHeaders(), payload,

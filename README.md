@@ -44,15 +44,23 @@ Xplayer 是一款面向 Emby / Jellyfin 用户的现代桌面播放器。它不�
 
 ## 📥 下载
 
-最新版本：**v1.0.5**
+最新版本：**v1.0.6**
 
 | 安装包 | 说明 |
 |---|---|
-| [Xplayer-1.0.5-Setup.exe](https://github.com/xtq94kws7z-droid/Xplayer/releases/download/v1.0.5/Xplayer-1.0.5-Setup.exe) | Windows 10/11 x64 安装包 |
+| [Xplayer-1.0.6-Setup.exe](https://github.com/xtq94kws7z-droid/Xplayer/releases/download/v1.0.6/Xplayer-1.0.6-Setup.exe) | Windows 10/11 x64 安装包 |
 
 旧版本可以在 [Releases](https://github.com/xtq94kws7z-droid/Xplayer/releases) 页面下载。
 
-## 🚀 v1.0.5 更新内容
+## 🚀 v1.0.6 更新内容
+
+- 海报墙改为从整个媒体库随机抽取作品，不再使用观看历史作为来源。
+- 海报墙在一次启动期间保持稳定，返回主页不会重新抽取作品。
+- 自动补齐海报墙简介，并在固定面板尺寸内智能精简显示，悬停可查看完整简介。
+- 修复海报墙切换按钮的圆角、图标居中和响应式尺寸问题。
+- 限制海报墙候选数量和详情请求数量，降低启动时的网络与内存负载。
+
+### 历史版本 1.0.5
 
 - 修复播放器全屏后 Windows 任务栏仍然覆盖画面的问题。
 - 统一 Xplayer 的作者、许可证、安装器发布者和 Windows 文件元数据。
@@ -231,15 +239,23 @@ Xplayer is a modern desktop client for Emby and Jellyfin. Built natively with **
 
 ## 📥 Download
 
-Latest release: **v1.0.5**
+Latest release: **v1.0.6**
 
 | Package | Description |
 |---|---|
-| [Xplayer-1.0.5-Setup.exe](https://github.com/xtq94kws7z-droid/Xplayer/releases/download/v1.0.5/Xplayer-1.0.5-Setup.exe) | Windows 10/11 x64 installer |
+| [Xplayer-1.0.6-Setup.exe](https://github.com/xtq94kws7z-droid/Xplayer/releases/download/v1.0.6/Xplayer-1.0.6-Setup.exe) | Windows 10/11 x64 installer |
 
 Older releases are available on the [Releases](https://github.com/xtq94kws7z-droid/Xplayer/releases) page.
 
-## 🚀 What's New in v1.0.5
+## 🚀 What's New in v1.0.6
+
+- Changed the poster wall to sample randomly from the entire media library instead of viewing history.
+- Kept the poster selection stable during a session so returning home does not reshuffle it.
+- Restored poster overviews with compact display text and full-overview tooltips.
+- Fixed circular poster navigation buttons, centered icons, and responsive sizing.
+- Added bounded candidate and detail-request counts to keep startup network and memory usage predictable.
+
+### Previous release 1.0.5
 
 - Fixed the Windows taskbar remaining visible over fullscreen playback.
 - Unified Xplayer authorship, licensing, installer publisher, and Windows file metadata.

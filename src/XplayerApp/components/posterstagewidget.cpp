@@ -6,6 +6,7 @@
 
 #include <QAbstractItemModel>
 #include <QEnterEvent>
+#include <QFontMetrics>
 #include <QGraphicsOpacityEffect>
 #include <QHideEvent>
 #include <QHBoxLayout>
@@ -19,7 +20,10 @@
 #include <QPushButton>
 #include <QPropertyAnimation>
 #include <QShowEvent>
+#include <QStyle>
 #include <QTimer>
+#include <QTextLayout>
+#include <QTextOption>
 #include <QVariantAnimation>
 #include <QVBoxLayout>
 #include <QVector>
@@ -40,6 +44,73 @@ struct PosterDrawSlot {
     qreal position = 0.0;
     bool focused = false;
 };
+
+QString compactOverview(const QString& overview, const QFont& font, int width,
+                        int height)
+{
+    const QString normalized = overview.simplified();
+    if (normalized.isEmpty() || width <= 0 || height <= 0) {
+        return normalized;
+    }
+
+    const QFontMetrics metrics(font);
+    const int lineHeight = qMax(1, metrics.lineSpacing());
+    const int maxLines = qMax(1, height / lineHeight);
+    auto fits = [&](const QString& text) {
+        QTextLayout layout(text, font);
+        QTextOption option;
+        option.setWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
+        layout.setTextOption(option);
+        layout.beginLayout();
+        int lineCount = 0;
+        while (true) {
+            QTextLine line = layout.createLine();
+            if (!line.isValid()) {
+                break;
+            }
+            line.setLineWidth(width);
+            ++lineCount;
+            if (lineCount > maxLines) {
+                break;
+            }
+        }
+        layout.endLayout();
+        return lineCount <= maxLines;
+    };
+
+    if (fits(normalized)) {
+        return normalized;
+    }
+
+    constexpr QChar ellipsis = QChar(0x2026);
+    int low = 0;
+    int high = normalized.size();
+    while (low < high) {
+        const int middle = (low + high + 1) / 2;
+        const QString candidate =
+            normalized.left(middle).trimmed() + ellipsis;
+        if (fits(candidate)) {
+            low = middle;
+        } else {
+            high = middle - 1;
+        }
+    }
+
+    int cut = low;
+    const int sentenceSearchStart = qMax(0, cut - cut / 2);
+    for (int index = cut - 1; index >= sentenceSearchStart; --index) {
+        const QChar character = normalized.at(index);
+        if (character == QChar(0x3002) || character == QChar(0xFF01) ||
+            character == QChar(0xFF1F) || character == QChar('!') ||
+            character == QChar('?') || character == QChar(';') ||
+            character == QChar(0xFF1B)) {
+            cut = index + 1;
+            break;
+        }
+    }
+
+    return normalized.left(cut).trimmed() + ellipsis;
+}
 
 QRect centeredAspectRect(const QRect& bounds, const QSize& sourceSize)
 {
@@ -348,15 +419,17 @@ PosterStageWidget::PosterStageWidget(QWidget* parent)
         }
     });
 
-    m_previousButton = new QPushButton(QStringLiteral("‹"), infoPanel);
+    m_previousButton = new QPushButton(infoPanel);
     m_previousButton->setObjectName(QStringLiteral("poster-stage-previous"));
+    m_previousButton->setIcon(style()->standardIcon(QStyle::SP_ArrowLeft));
     m_previousButton->setCursor(Qt::PointingHandCursor);
     m_previousButton->setToolTip(tr("上一部精选"));
     connect(m_previousButton, &QPushButton::clicked, this,
             [this]() { advance(-1); });
 
-    m_nextButton = new QPushButton(QStringLiteral("›"), infoPanel);
+    m_nextButton = new QPushButton(infoPanel);
     m_nextButton->setObjectName(QStringLiteral("poster-stage-next"));
+    m_nextButton->setIcon(style()->standardIcon(QStyle::SP_ArrowRight));
     m_nextButton->setCursor(Qt::PointingHandCursor);
     m_nextButton->setToolTip(tr("下一部精选"));
     connect(m_nextButton, &QPushButton::clicked, this,
@@ -808,6 +881,7 @@ void PosterStageWidget::updateOverlayGeometry()
             }
         }
 
+        const int navDimension = qRound(28 * scale);
         if (qAbs(m_lastResponsiveScale - scale) > 0.01) {
             m_lastResponsiveScale = scale;
             m_eyebrowLabel->setStyleSheet(
@@ -820,13 +894,21 @@ void PosterStageWidget::updateOverlayGeometry()
                 QStringLiteral("font-size: %1px;").arg(qRound(13 * scale)));
             m_playButton->setStyleSheet(
                 QStringLiteral("font-size: %1px;").arg(qRound(13 * scale)));
-            m_previousButton->setStyleSheet(
-                QStringLiteral("font-size: %1px;").arg(qRound(22 * scale)));
-            m_nextButton->setStyleSheet(
-                QStringLiteral("font-size: %1px;").arg(qRound(22 * scale)));
+            const QString navigationButtonStyle = QStringLiteral(
+                "border-radius: %1px; padding: 0; margin: 0;")
+                .arg(navDimension / 2);
+            m_previousButton->setStyleSheet(navigationButtonStyle);
+            m_nextButton->setStyleSheet(navigationButtonStyle);
         }
 
-        const QSize navSize(qRound(28 * scale), qRound(28 * scale));
+        const QSize navSize(navDimension, navDimension);
+        const QSize navIconSize(qRound(14 * scale), qRound(14 * scale));
+        if (m_previousButton->iconSize() != navIconSize) {
+            m_previousButton->setIconSize(navIconSize);
+        }
+        if (m_nextButton->iconSize() != navIconSize) {
+            m_nextButton->setIconSize(navIconSize);
+        }
         if (m_previousButton->size() != navSize ||
             m_previousButton->minimumSize() != navSize ||
             m_previousButton->maximumSize() != navSize) {
@@ -869,7 +951,11 @@ void PosterStageWidget::updateOverlayGeometry()
         meta << item.seriesName.trimmed();
     }
     m_metaLabel->setText(meta.join(QStringLiteral("  ·  ")));
-    m_overviewLabel->setText(item.overview.simplified());
+    const QString fullOverview = item.overview.simplified();
+    m_overviewLabel->setText(compactOverview(
+        fullOverview, m_overviewLabel->font(), m_overviewLabel->maximumWidth(),
+        m_overviewLabel->height()));
+    m_overviewLabel->setToolTip(fullOverview);
 }
 
 void PosterStageWidget::updateControls()

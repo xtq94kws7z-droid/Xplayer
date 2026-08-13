@@ -137,6 +137,7 @@ public:
     QCoro::Task<QList<MediaItem>> searchMedia(const QString& searchTerm, const QString& includeItemTypes = "Movie,Series,BoxSet,Person", const QString& sortBy = "", const QString& sortOrder = "Ascending", int limit = 50);
 
     QCoro::Task<MediaItem> getItemDetail(const QString& itemId);
+    QCoro::Task<QList<MediaItem>> getItemDetails(const QStringList& itemIds);
     
     QCoro::Task<PlaybackInfo> getPlaybackInfo(const QString& itemId);
 
